@@ -1,35 +1,39 @@
-# Programsko inženjerstvo
-
-> Ime projekta u naslovu ima cilj opisati namjenu projekta te pomoći u podizanju početnog interesa za projekt prezentirajući osnovnu svrhu projekta.
-> Isključivo ovisi o Vama!
-> 
-> Naravno, nijedan predložak nije idealan za sve projekte jer su potrebe i ciljevi različiti. Ne bojte se naglasiti Vaš cilj u ovoj početnoj stranici projekta, podržat ćemo ga bez obzira usredotočili se Vi više na tenologiju ili marketing.
-> 
-> Zašto ovaj dokument? Samo manji dio timova je do sada propoznao potrebu (a i meni je lakše pratiti Vaš rad).  
+# Programsko inženjerstvo (StyleTrack)
 
 # Opis projekta
-Ovaj projekt je reultat timskog rada u sklopu projeknog zadatka kolegija [Programsko inženjerstvo](https://www.fer.unizg.hr/predmet/proinz) na Fakultetu elektrotehnike i računarstva Sveučilišta u Zagrebu. 
+Ovaj projekt je rezultat timskog rada u sklopu projeknog zadatka kolegija [Programsko inženjerstvo](https://www.fer.unizg.hr/predmet/proinz) na Fakultetu elektrotehnike i računarstva Sveučilišta u Zagrebu. 
 
-Kratko opisati cilj Vašeg projekta. Vaša motivacija?  (Napomena: odgovor nije »Zato što je to bio zadatak i nismo imali ideje za drugo.«). Koji problem rješavate?
-> Obzirom da je ovo zadani projekt navedite i što želite/jeste novo  naučili.
-
-> Dobro izrađen opis omogućuje vam da pokažete svoj rad drugim programerima, kao i potencijalnim poslodavcima. Ne samo da prvi dojam na stranici opisa često razlikuje dobar projekt od lošeg projekta već i predstavlja dobru praksu koju morate savladati.
+Ova aplikacija omogućuje korisnicima upravljanje stvarima u svojim ormarima, dijeljenje odjevnih predmeta s drugim korisnicima u blizini te pregled ponuda oglašivača. Korisnici koristeći mapu unutura aplikacije mogu vidjeti javne ormare drugih korisnika u stvarnom vremenu. Aplikacija je istovremeno korisna za organizaciju i za razmjenu stvari s drugim korisnicima. Projekt obuhvaća funkcionalne i nefunkcionalne zahtjeve koji omogućuju jednostavno korištenje, skalabilnost i proširivost aplikacije.
 
 # Funkcijski zahtjevi
-> Navedite ključne zahtjeve Vašeg projekta.
-
+- Aplikacija treba omogućiti korisniku da ju koristi kao prijavljeni korisnik i kao gost (neprijavljeni korisnik)
+- Aplikacija treba imati pristup korisnikovoj lokaciji i prikazati ju kroz grafičko sučelje
+- Korisnik mora moći dodavati/uklanjati/uređivati/pretraživati stvari koje posjeduje u svojim oramarima i sustav to mora trajno pamtiti. Isto vrijedi i za virtualne ormare.
+- Kada korisnik želi vidjeti što su ostali korisnici (u njegovoj) blizini postavili na dijeljenje aplikacija mu to treba prikazati preko mape kroz grafičko sučelje
+- Iz gornjeg zahtjeva vidimo da sustav mora pamtiti koji je ormar na kojoj geolokaciji i kojem korisniku pripada kako bi imao sve relevantne informacije
+- Sustav bi trebao moći labelirati sve odjevne predmete kako bi kasnije na osnovu tih labela mogao kategorizirati, filtrirati i pretraživati iste na brz i efikasan način
+- Sustav treba omogućiti i oglašivačima da stvore svoje profile, dodaju artikle i nakon toga ih predstaviti korisnicima na suptilan način kako bi korisnici mogli pogledati što koji olgašivač nudi
+- Sustav mora moći primati i slati fotografije jer su potrebne za slike artikala, logo firme itd.
 
 # Tehnologije
+- PostgreSQL
+- Java Spring Boot
+- React
 
-#Instalcija
+## Instalcija
+> TBD
+
 # Članovi tima 
-> Popis članova tima/linkovi/ glavni doprinos
->
+[Lucija Bralić](https://github.com/lucija3462)
+[Marko Lujo](https://github.com/MarkoLujo)
+[Benjamin Teskera](https://github.com/BenjaminTeskera)
+[Ivan Džankić](https://github.com/dzankicivan)
+[Dominik Kos](https://github.com/dominikKos9)
+[Domagoj Radman](https://github.com/dr54426)
+[Ivan Došlić](https://github.com/ivandoslic-fer)
 
 # Kontribucije
->Pravila ovise o organizaciji tima i su često izdvojena u CONTRIBUTING.md
-
-
+> TBD
 
 # 📝 Kodeks ponašanja [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 Kao studenti sigurno ste upoznati s minimumom prihvatljivog ponašanja definiran u [KODEKS PONAŠANJA STUDENATA FAKULTETA ELEKTROTEHNIKE I RAČUNARSTVA SVEUČILIŠTA U ZAGREBU](https://www.fer.hr/_download/repository/Kodeks_ponasanja_studenata_FER-a_procisceni_tekst_2016%5B1%5D.pdf), te dodatnim naputcima za timski rad na predmetu [Programsko inženjerstvo](https://wwww.fer.hr).
