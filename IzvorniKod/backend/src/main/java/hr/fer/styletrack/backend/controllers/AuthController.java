@@ -8,6 +8,7 @@ import hr.fer.styletrack.backend.entities.AdvertiserProfile;
 import hr.fer.styletrack.backend.entities.Role;
 import hr.fer.styletrack.backend.entities.User;
 import hr.fer.styletrack.backend.repos.IAdvertiserProfileRepository;
+import hr.fer.styletrack.backend.repos.IRoleRepository;
 import hr.fer.styletrack.backend.repos.IUserRepository;
 import hr.fer.styletrack.backend.utils.JwtUtil;
 import hr.fer.styletrack.backend.utils.StyleTrackConstants;
@@ -27,13 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api")
 public class AuthController {
     private final IUserRepository userRepository;
     private final IAdvertiserProfileRepository advertiserProfileRepository;
+    private final IRoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
@@ -43,12 +44,14 @@ public class AuthController {
                           PasswordEncoder passwordEncoder,
                           JwtUtil jwtUtil,
                           AuthenticationManager authenticationManager,
-                          IAdvertiserProfileRepository advertiserProfileRepository) {
+                          IAdvertiserProfileRepository advertiserProfileRepository,
+                          IRoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
         this.advertiserProfileRepository = advertiserProfileRepository;
+        this.roleRepository = roleRepository;
     }
 
     @PostMapping("/login")
@@ -97,8 +100,12 @@ public class AuthController {
         user.setAdvertiser(false);
 
         // TODO: Get the role from 'role' table and then assign it to user so you don't make duplicated roles!
-        user.setRoles(registerRequest.isAdvertiser() ? List.of(new Role(StyleTrackConstants.ADVERTISER_USER_ROLE)) : List.of(new Role(StyleTrackConstants.PERSONAL_USER_ROLE)));
+        //user.setRoles(registerRequest.isAdvertiser() ? List.of(new Role(StyleTrackConstants.ADVERTISER_USER_ROLE)) : List.of(new Role(StyleTrackConstants.PERSONAL_USER_ROLE)));
+        String roleName = registerRequest.isAdvertiser() ? StyleTrackConstants.ADVERTISER_USER_ROLE : StyleTrackConstants.PERSONAL_USER_ROLE;
+        Role role = roleRepository.findByName(roleName)
+                .orElseGet(() -> roleRepository.save(new Role(roleName)));
 
+        user.setRoles(List.of(role));
         userRepository.save(user);
 
         if (registerRequest.isAdvertiser()) {
