@@ -69,7 +69,7 @@ public class AuthController {
 
             // Generate JWT
             String jwt = jwtUtil.generateToken(loginRequest.getUsername(), user.get());
-            return ResponseEntity.ok(new LoginResponse(jwt, loginRequest.getUsername(), new UserDto(user.get().getId(), user.get().getUsername(), user.get().getEmail())));  // Return the token
+            return ResponseEntity.ok(new LoginResponse(jwt, loginRequest.getUsername(), new UserDto(user.get().getId(), user.get().getUsername(), user.get().getEmail(), user.get().getDisplayName())));  // Return the token
 
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
@@ -87,7 +87,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is already taken");
         }
 
-        /*if (registerRequest.isAdvertiser() && advertiserProfileRepository.findAdvertiserProfileByUser(userRepository.findByUsername(registerRequest.getUsername()).get()).isPresent()) {
+        /*if (registerRequest.isAdvertiser() && (userRepository.findByUsername(registerRequest.getUsername()).get()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Advertiser profile already exists");
         }*/
 
@@ -97,7 +97,7 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setEmail(registerRequest.getEmail());
         user.setDisplayName(registerRequest.getDisplayName());
-        user.setAdvertiser(false);
+        user.setAdvertiser(registerRequest.isAdvertiser());
 
         // TODO: Get the role from 'role' table and then assign it to user so you don't make duplicated roles!
         //user.setRoles(registerRequest.isAdvertiser() ? List.of(new Role(StyleTrackConstants.ADVERTISER_USER_ROLE)) : List.of(new Role(StyleTrackConstants.PERSONAL_USER_ROLE)));
@@ -105,7 +105,11 @@ public class AuthController {
         Role role = roleRepository.findByName(roleName)
                 .orElseGet(() -> roleRepository.save(new Role(roleName)));
 
-        user.setRoles(List.of(role));
+        
+        Role role_common = roleRepository.findByName(StyleTrackConstants.COMMON_USER_ROLE)
+                .orElseGet(() -> roleRepository.save(new Role(StyleTrackConstants.COMMON_USER_ROLE)));
+
+        user.setRoles(List.of(role_common, role));
         userRepository.save(user);
 
         if (registerRequest.isAdvertiser()) {
