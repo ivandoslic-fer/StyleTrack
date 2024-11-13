@@ -11,6 +11,6 @@ public class RegisterRequest {
     private String email;
     private String displayName;
     private String address;
-    private String website;
+    private String companyEmail;
     private boolean advertiser;
 }

@@ -115,7 +115,7 @@ public class AuthController {
         if (registerRequest.isAdvertiser()) {
             AdvertiserProfile advertiserProfile = new AdvertiserProfile();
             advertiserProfile.setCompanyAddress(registerRequest.getAddress());
-            advertiserProfile.setCompanyWebsite(registerRequest.getWebsite());
+            advertiserProfile.setCompanyEmail(registerRequest.getEmail());
             advertiserProfile.setUser(user);
             advertiserProfileRepository.save(advertiserProfile);
         }
