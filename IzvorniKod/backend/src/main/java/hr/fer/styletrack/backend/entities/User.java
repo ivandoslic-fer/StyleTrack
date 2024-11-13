@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
@@ -35,5 +36,8 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, optional = true)
     private AdvertiserProfile advertiserProfile;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Collection<Wardrobe> wardrobes;
 }
 
