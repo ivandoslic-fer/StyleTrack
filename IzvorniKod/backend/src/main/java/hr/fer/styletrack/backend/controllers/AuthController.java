@@ -69,7 +69,7 @@ public class AuthController {
 
             // Generate JWT
             String jwt = jwtUtil.generateToken(loginRequest.getUsername(), user.get());
-            return ResponseEntity.ok(new LoginResponse(jwt, loginRequest.getUsername(), new UserDto(user.get().getId(), user.get().getUsername(), user.get().getEmail())));  // Return the token
+            return ResponseEntity.ok(new LoginResponse(jwt, loginRequest.getUsername(), new UserDto(user.get().getId(), user.get().getUsername(), user.get().getEmail(), user.get().getDisplayName())));  // Return the token
 
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
@@ -87,20 +87,14 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is already taken");
         }
 
-        /*if (registerRequest.isAdvertiser() && advertiserProfileRepository.findAdvertiserProfileByUser(userRepository.findByUsername(registerRequest.getUsername()).get()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Advertiser profile already exists");
-        }*/
-
         // Create new user with hashed password
         User user = new User();
         user.setUsername(registerRequest.getUsername());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setEmail(registerRequest.getEmail());
         user.setDisplayName(registerRequest.getDisplayName());
-        user.setAdvertiser(false);
+        user.setAdvertiser(registerRequest.isAdvertiser());
 
-        // TODO: Get the role from 'role' table and then assign it to user so you don't make duplicated roles!
-        //user.setRoles(registerRequest.isAdvertiser() ? List.of(new Role(StyleTrackConstants.ADVERTISER_USER_ROLE)) : List.of(new Role(StyleTrackConstants.PERSONAL_USER_ROLE)));
         String roleName = registerRequest.isAdvertiser() ? StyleTrackConstants.ADVERTISER_USER_ROLE : StyleTrackConstants.PERSONAL_USER_ROLE;
         Role role = roleRepository.findByName(roleName)
                 .orElseGet(() -> roleRepository.save(new Role(roleName)));
@@ -111,7 +105,7 @@ public class AuthController {
         if (registerRequest.isAdvertiser()) {
             AdvertiserProfile advertiserProfile = new AdvertiserProfile();
             advertiserProfile.setCompanyAddress(registerRequest.getAddress());
-            advertiserProfile.setCompanyWebsite(registerRequest.getWebsite());
+            advertiserProfile.setCompanyEmail(registerRequest.getEmail());
             advertiserProfile.setUser(user);
             advertiserProfileRepository.save(advertiserProfile);
         }

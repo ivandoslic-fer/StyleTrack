@@ -9,10 +9,12 @@ public class UserDto {
     private Long id;
     private String username;
     private String email;
+    private String displayName;
 
-    public UserDto(Long id, String username, String email) {
+    public UserDto(Long id, String username, String email, String displayName) {
         this.id = id;
         this.username = username;
         this.email = email;
+        this.displayName = displayName;
     }
 }
