@@ -20,14 +20,14 @@ public class AdvertiserProfile implements Serializable {
     private User user;
 
     private String companyAddress;
-    private String companyWebsite;
+    private String companyEmail;
 
     // Constructors
     public AdvertiserProfile() {}
 
-    public AdvertiserProfile(User user, String companyAddress, String companyWebsite) {
+    public AdvertiserProfile(User user, String companyAddress, String companyEmail) {
         this.user = user;
         this.companyAddress = companyAddress;
-        this.companyWebsite = companyWebsite;
+        this.companyEmail = companyEmail;
     }
 }
