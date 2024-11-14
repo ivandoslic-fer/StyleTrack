@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 @RequestMapping("/api/sections")
 public class SectionsController {
-    private final IUserRepository userRepository;
     private final IWardrobeRepository wardrobeRepository;
     private final ISectionRepository sectionRepository;
 

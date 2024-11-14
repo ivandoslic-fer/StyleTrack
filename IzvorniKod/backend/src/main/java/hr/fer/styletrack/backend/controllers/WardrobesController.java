@@ -33,7 +33,7 @@ public class WardrobesController {
     public ResponseEntity<Collection<WardrobeDto>> getWardrobes(@RequestParam String username, @RequestParam Optional<Boolean> forSharing, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal) { // TODO: When looking for public take another param and query for all public wardrobes
 
         if (forSharing.isPresent() && forSharing.get()) {
-            return ResponseEntity.ok(wardrobeRepository.getWardrobesByPublicIsTrue().stream()
+            return ResponseEntity.ok(wardrobeRepository.getWardrobesByIsPublicIsTrue().stream()
                     .map(wardrobe -> new WardrobeDto(
                             wardrobe.getUser().getId(),
                             wardrobe.getWardrobeId(),
