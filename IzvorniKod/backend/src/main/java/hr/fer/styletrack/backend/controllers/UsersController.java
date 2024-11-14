@@ -1,8 +1,16 @@
 package hr.fer.styletrack.backend.controllers;
 
+import hr.fer.styletrack.backend.dtos.ItemDto;
+import hr.fer.styletrack.backend.dtos.SectionDto;
 import hr.fer.styletrack.backend.dtos.UserDto;
+import hr.fer.styletrack.backend.dtos.WardrobeDto;
+import hr.fer.styletrack.backend.entities.Section;
 import hr.fer.styletrack.backend.entities.User;
+import hr.fer.styletrack.backend.entities.Wardrobe;
+import hr.fer.styletrack.backend.repos.IItemRepository;
+import hr.fer.styletrack.backend.repos.ISectionRepository;
 import hr.fer.styletrack.backend.repos.IUserRepository;
+import hr.fer.styletrack.backend.repos.IWardrobeRepository;
 import hr.fer.styletrack.backend.utils.StyleTrackConstants;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
@@ -12,8 +20,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RestController
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -21,6 +35,9 @@ import java.util.Optional;
 public class UsersController {
 
     private final IUserRepository userRepository;
+    private final IWardrobeRepository wardrobeRepository;
+    private final ISectionRepository sectionRepository;
+    private final IItemRepository itemRepository;
 
     @GetMapping("/")
     public ResponseEntity<List<UserDto>> getUsers() {
