@@ -25,7 +25,8 @@ public class Wardrobe {
     private Long wardrobeId;
     
     private String wardrobeName;
-    private Collection<String> tags;
+    private boolean isPublic;
+    // private Collection<String> tags;
 
     public Wardrobe(){  }
 
