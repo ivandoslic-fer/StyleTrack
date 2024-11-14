@@ -46,9 +46,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/api/login", "/api/register", "/oauth2/**").permitAll();
-                    auth.requestMatchers("/api/users/**").hasRole(StyleTrackConstants.COMMON_USER_ROLE);
-                    auth.requestMatchers("/api/advertisers/**").hasRole(StyleTrackConstants.COMMON_USER_ROLE);
+                    auth.requestMatchers("/api/login", "/api/register", "/oauth2/**", "/api/users/**", "/api/advertisers/**").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> {

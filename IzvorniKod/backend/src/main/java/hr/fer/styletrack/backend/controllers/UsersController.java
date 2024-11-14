@@ -47,7 +47,6 @@ public class UsersController {
     }
 
     @PutMapping("/{id}")
-    @RolesAllowed(StyleTrackConstants.COMMON_USER_ROLE)
     @PreAuthorize("#id == principal.user.id") // Ovako provjeravati je li korisnik onaj za kojeg se predstavlja da je
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
         Optional<User> user = userRepository.findById(id);
@@ -70,7 +69,6 @@ public class UsersController {
     }
 
     @DeleteMapping("/{id}")
-    @RolesAllowed(StyleTrackConstants.COMMON_USER_ROLE)
     @PreAuthorize("#id == principal.user.id")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         Optional<User> user = userRepository.findById(id);
@@ -81,5 +79,4 @@ public class UsersController {
         userRepository.delete(user.get());
         return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully");
     }
-
 }

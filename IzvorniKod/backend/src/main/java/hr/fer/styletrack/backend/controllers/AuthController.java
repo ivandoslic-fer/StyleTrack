@@ -87,10 +87,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is already taken");
         }
 
-        /*if (registerRequest.isAdvertiser() && (userRepository.findByUsername(registerRequest.getUsername()).get()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Advertiser profile already exists");
-        }*/
-
         // Create new user with hashed password
         User user = new User();
         user.setUsername(registerRequest.getUsername());
@@ -99,17 +95,11 @@ public class AuthController {
         user.setDisplayName(registerRequest.getDisplayName());
         user.setAdvertiser(registerRequest.isAdvertiser());
 
-        // TODO: Get the role from 'role' table and then assign it to user so you don't make duplicated roles!
-        //user.setRoles(registerRequest.isAdvertiser() ? List.of(new Role(StyleTrackConstants.ADVERTISER_USER_ROLE)) : List.of(new Role(StyleTrackConstants.PERSONAL_USER_ROLE)));
         String roleName = registerRequest.isAdvertiser() ? StyleTrackConstants.ADVERTISER_USER_ROLE : StyleTrackConstants.PERSONAL_USER_ROLE;
         Role role = roleRepository.findByName(roleName)
                 .orElseGet(() -> roleRepository.save(new Role(roleName)));
 
-        
-        Role role_common = roleRepository.findByName(StyleTrackConstants.COMMON_USER_ROLE)
-                .orElseGet(() -> roleRepository.save(new Role(StyleTrackConstants.COMMON_USER_ROLE)));
-
-        user.setRoles(List.of(role_common, role));
+        user.setRoles(List.of(role));
         userRepository.save(user);
 
         if (registerRequest.isAdvertiser()) {
