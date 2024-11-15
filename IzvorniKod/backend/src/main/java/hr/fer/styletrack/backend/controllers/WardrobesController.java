@@ -1,5 +1,6 @@
 package hr.fer.styletrack.backend.controllers;
 
+import hr.fer.styletrack.backend.dtos.WardrobeDetailedDto;
 import hr.fer.styletrack.backend.dtos.WardrobeDto;
 import hr.fer.styletrack.backend.entities.User;
 import hr.fer.styletrack.backend.entities.Wardrobe;
@@ -30,9 +31,13 @@ public class WardrobesController {
     private final IWardrobeRepository wardrobeRepository;
 
     @GetMapping("/")
-    public ResponseEntity<Collection<WardrobeDto>> getWardrobes(@RequestParam String username, @RequestParam Optional<Boolean> forSharing, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal) { // TODO: When looking for public take another param and query for all public wardrobes
+    public ResponseEntity<Collection<WardrobeDto>> getWardrobes(@RequestParam String username, @RequestParam Boolean forSharing, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal) { // TODO: When looking for public take another param and query for all public wardrobes
 
-        if (forSharing.isPresent() && forSharing.get()) {
+        System.out.println(authenticatedPrincipal);
+        System.out.println(username);
+        System.out.println(forSharing);
+
+        if (forSharing != null && forSharing && (username.isEmpty())) {
             return ResponseEntity.ok(wardrobeRepository.getWardrobesByIsPublicIsTrue().stream()
                     .map(wardrobe -> new WardrobeDto(
                             wardrobe.getUser().getId(),
@@ -42,28 +47,35 @@ public class WardrobesController {
                     )).collect(Collectors.toList()));
         } // You need to look if there are no wardrobes and return NOT_FOUND in that case
 
-        if (!username.equals(authenticatedPrincipal.user.getUsername())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!username.isEmpty() && forSharing != null && forSharing) {
+            Optional<User> user = userRepository.findByUsername(username);
+
+            if (user.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            return ResponseEntity.ok(user.get().getWardrobes().stream()
+                    .filter(Wardrobe::isPublic)
+                    .map(WardrobeDto::new).collect(Collectors.toList()));
         }
 
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isPresent()) {
+        if ((forSharing == null || !forSharing) && username.equals(authenticatedPrincipal.user.getUsername())) {
+
+            Optional<User> user = userRepository.findByUsername(username);
+
+            if (user.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
             return ResponseEntity.ok(user.get().getWardrobes().stream()
-                    .map(wardrobe -> new WardrobeDto(
-                            user.get().getId(),
-                            wardrobe.getWardrobeId(),
-                            wardrobe.getWardrobeName(),
-                            new ArrayList<>() // temporary
-                            // wardrobe.getTags()
-                    )).collect(Collectors.toList())
-            );
-        } else {
-            return ResponseEntity.notFound().build();
+                    .map(WardrobeDto::new).collect(Collectors.toList()));
         }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @GetMapping("/{wardrobeId}")
-    public ResponseEntity<WardrobeDto> getWardrobeById(@PathVariable Long wardrobeId, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal) {
+    public ResponseEntity<WardrobeDetailedDto> getWardrobeById(@PathVariable Long wardrobeId, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal) {
         Wardrobe wardrobe = wardrobeRepository.findById(wardrobeId).orElse(null);
 
         if (wardrobe == null) {
@@ -74,7 +86,7 @@ public class WardrobesController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        return ResponseEntity.ok(new WardrobeDto(wardrobe));
+        return ResponseEntity.ok(new WardrobeDetailedDto(wardrobe));
     }
 
     @PostMapping("/new")
@@ -88,6 +100,8 @@ public class WardrobesController {
         if (!usersWardrobeDto.getOwnerId().equals(authenticatedPrincipal.user.getId())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
+        System.out.println(usersWardrobeDto);
 
         try {
             Wardrobe newWardrobe = new Wardrobe();

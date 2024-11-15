@@ -8,10 +8,13 @@ import LoginPage from "../pages/LoginPage";
 import ProfilePage from "../pages/ProfilePage";
 import RegisterPage from "../pages/RegisterPage";
 import OAuth2RedirectHandler from '../pages/OAuthRedirect';
-import MyClosetsPage from '../pages/MyClosetsPage';
 import ClosetPage from '../pages/ClosetPage';
 import ProfileSettingsPage from '../pages/ProfileSettingsPage';
-import WardrobesPage from '../pages/WardrobesPage';
+import ClosetsPage from '../pages/ClosetsPage';
+import CreateWardrobePage from '../pages/CreateWardrobePage';
+import CreateSectionPage from '../pages/CreateSectionPage';
+import SectionPage from '../pages/SectionPage';
+import CreateItemPage from '../pages/CreateItemPage';
 
 
 const BACKEND_URL = "https://styletrack-backend-stage.onrender.com/api";
@@ -171,6 +174,16 @@ async function loadProfile(username) {
     return response.data;
 }
 
+async function loadWardrobe(wardrobeId) {
+    const response = await requestHandler.getRequest(`/wardrobes/${wardrobeId}`);
+    return response.data;
+}
+
+async function loadSection(sectionId) {
+    const response = await requestHandler.getRequest(`/sections/${sectionId}`);
+    return response.data;
+}
+
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -212,15 +225,38 @@ export const router = createBrowserRouter([
     },
     {
         path: "/wardrobes",
-        Component: WardrobesPage
+        Component: ClosetsPage,
+    },
+    {
+        path: "/wardrobes/create",
+        Component: CreateWardrobePage
+    },
+    {
+        path: "/wardrobes/:wardrobeId",
+        loader: async ({ params }) => {
+            // We'll need to handle the public logic here
+            return loadWardrobe(params.wardrobeId);
+        },
+        Component: ClosetPage,
+    },
+    {
+        path: "/wardrobes/:wardrobeId/addSection",
+        Component: CreateSectionPage
+    },
+    {
+        path: "/wardrobes/:wardrobeId/:sectionId",
+        loader: async ({ params }) => {
+            return loadSection(params.sectionId);
+        },
+        Component: SectionPage
+    },
+    {
+        path: "/wardrobes/:wardrobeId/:sectionId/addItem",
+        Component: CreateItemPage
     },
     {
         path: "/oauth2/redirect",
         Component: OAuth2RedirectHandler
-    },
-    {
-        path: "/myclosets",
-        Component: MyClosetsPage
     },
     {
         path: "/closet",

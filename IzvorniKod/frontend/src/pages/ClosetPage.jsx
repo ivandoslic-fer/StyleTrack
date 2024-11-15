@@ -1,122 +1,148 @@
-import { useEffect } from "react";
-import { Container, Box, Button, Typography, Divider, Avatar } from '@mui/material';
+import { Container, Box, Button, Typography, Divider, Avatar, Card } from "@mui/material";
+import { useLoaderData } from "react-router-dom";
 
 export default function ClosetPage() {
-  // Hardkodirani primjeri ormara
-  const myClosets = [
-    { name: "Shelves", image: "https://via.placeholder.com/100", count: 3 },
-    { name: "Drawers", image: "https://via.placeholder.com/100", count: 4 },
-    { name: "Clothing rails", image: "https://via.placeholder.com/100", count: 5 }
-  ];
+  const data = useLoaderData();
 
   const textStyle = {
-    fontFamily: 'Roboto, sans-serif',
-    fontSize: '20px',
+    fontFamily: "Roboto, sans-serif",
+    fontSize: "18px",
     fontWeight: 500,
-    lineHeight: '23.44px',
-    textAlign: 'center',
-    textUnderlinePosition: 'from-font',
-    textDecorationSkipInk: 'none',
-    paddingTop: '10px'
+    lineHeight: "22px",
+    textAlign: "left",
+    textUnderlinePosition: "from-font",
+    textDecorationSkipInk: "none",
+  };
+
+  const handleAddSection = () => {
+    console.log("Navigate to Add Section form");
+    location.assign(`/wardrobes/${data.wardrobeId}/addSection`);
   };
 
   return (
     <Container
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-start',  
-        alignItems: 'center',
-        minHeight: '100vh',
-        fontFamily: 'Roboto',
-        paddingTop: 0,  
-        marginTop: 0     
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        minHeight: "100vh",
+        fontFamily: "Roboto",
+        paddingTop: "20px",
       }}
     >
-      <Button
-        variant="contained"
-        color="primary"
-        sx={{
-          borderRadius: '45px',
-          padding: '5px 20px',
-          textTransform: 'none',
-          width: '200px',
-          height: '50px',
-          border: '1px solid black',
-          fontFamily: 'Roboto, sans-serif',
-          fontSize: '20px',
-          fontWeight: 400,
-          lineHeight: '23.44px',
-          textAlign: 'center',
-          marginBottom: '30px'
-        }}
-      >
-        Delete closet
-      </Button>
+      <Typography variant="h4" sx={{ marginBottom: "20px", fontWeight: 600 }}>
+        Wardrobe Sections
+      </Typography>
 
       <Box
         sx={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',  
-          gap: '30px',  
-          width: '100%',
-          justifyItems: 'center' 
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "repeat(1, 1fr)", // 1 column on small screens
+            sm: "repeat(2, 1fr)", // 2 columns on medium screens
+            md: "repeat(3, 1fr)", // 3 columns on larger screens
+          },
+          gap: "20px",
+          width: "100%",
+          maxWidth: "1200px",
         }}
       >
-        {myClosets.map((closet, index) => (
-          <Box
-            key={index}
+        {/* Add Section Card */}
+        <Card
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            background: "transparent",
+            border: "2px dashed #ccc",
+            borderRadius: "10px",
+            padding: "20px",
+            textAlign: "center",
+            cursor: "pointer",
+            transition: "0.3s",
+            "&:hover": {
+              backgroundColor: "#e5e7eb",
+            },
+            boxShadow: "none"
+          }}
+          onClick={handleAddSection}
+        >
+          <Typography
+            variant="h6"
             sx={{
-              display: 'flex',
-              flexDirection: 'row-reverse',  
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: '#D9D9D9',
-              borderRadius: '15px',
-              padding: '20px',
-              width: '100%',
-              maxWidth: '350px', 
-              boxSizing: 'border-box'
+              fontFamily: "Roboto, sans-serif",
+              fontSize: "20px",
+              fontWeight: 500,
+              marginBottom: "10px",
             }}
           >
-            {/* Slika ormara  */}
+            Add Section
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{
+              textTransform: "none",
+            }}
+          >
+            Create
+          </Button>
+        </Card>
+
+        {/* Render Wardrobe Sections */}
+        {data.sections.map((section) => (
+          <Box
+            key={section.sectionId}
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              alignItems: "center",
+              backgroundColor: "#f5f5f5",
+              borderRadius: "10px",
+              padding: "15px",
+              boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            {/* Section Image */}
             <Avatar
-              alt={closet.name}
-              src={closet.image}
+              alt={section.sectionName}
+              src={section.image || '/'}
               sx={{
-                width: 150,
-                height: 225,
-                borderRadius: '10%',
-                border: '1px solid black',
-                boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.2)',
-                marginLeft: '15px', 
+                width: 100,
+                height: 100,
+                borderRadius: "10%",
+                border: "1px solid #ddd",
+                boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
+                marginRight: "15px",
               }}
             />
 
-            {/* Tekst sa informacijama o ormaru */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', textAlign: 'left', marginLeft: '20px' }}>
-              <Typography variant="h6" sx={textStyle}>{closet.name}</Typography>
-              <Divider sx={{ width: '100%', marginBottom: '10px', borderColor: 'black' }} />
-
-              <Typography sx={textStyle}>
-                {closet.name}: {closet.count}
+            {/* Section Details */}
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h6" sx={{ ...textStyle, marginBottom: "5px" }}>
+                {section.sectionName}
               </Typography>
-
-              {/* Broj stavki u ormaru */}
+              <Typography sx={{ ...textStyle, color: "#757575" }}>
+                Type: {section.sectionType}
+              </Typography>
+              <Divider sx={{ marginY: "10px" }} />
+              <Typography sx={{ ...textStyle, fontWeight: 400 }}>
+                Items: ??/{section.sectionCapacity}
+              </Typography>
               <Button
                 variant="contained"
+                color="primary"
+                size="small"
                 sx={{
-                  marginTop: '10px',
-                  borderRadius: '20px',
-                  padding: '5px 20px',
-                  textTransform: 'none',
-                  fontFamily: 'Roboto, sans-serif',
-                  fontSize: '15px',
-                  fontWeight: 500,
-                  textAlign: 'center',
+                  marginTop: "10px",
+                  textTransform: "none",
                 }}
+                onClick={() => location.assign(`/wardrobes/${data.wardrobeId}/${section.sectionId}`)}
               >
-                {closet.count} Items
+                View Items
               </Button>
             </Box>
           </Box>

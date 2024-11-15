@@ -37,7 +37,7 @@ export default function ResponsiveAppBar() {
         {!isMobile && (
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
             <Button color="inherit"><a href='/'>Home</a></Button>
-            <Button color="inherit"><a href='/'>My Wardrobes</a></Button>
+            <Button color="inherit" onClick={() => location.assign(`/wardrobes?user=${styleTrackAuthProvider.username}`)}>My Wardrobes</Button>
             <Button color="inherit"><a href='/'>Search</a></Button>
           </Box>
         )}

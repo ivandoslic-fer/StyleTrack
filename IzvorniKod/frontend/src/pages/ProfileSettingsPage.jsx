@@ -1,7 +1,7 @@
 import { Avatar, Button, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { useLoaderData } from "react-router-dom";
-import { getRandomColor, requestHandler, styleTrackAuthProvider } from "../util/styleTrackUtil";
+import { getRandomColor, requestHandler } from "../util/styleTrackUtil";
 
 export default function ProfileSettingsPage() {
   const user = useLoaderData();
@@ -31,9 +31,6 @@ export default function ProfileSettingsPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(styleTrackAuthProvider.userData);
-    console.log(user);
-    console.log("Updated user settings:", formData);
 
     const newUserData = {
         id: user.id,
