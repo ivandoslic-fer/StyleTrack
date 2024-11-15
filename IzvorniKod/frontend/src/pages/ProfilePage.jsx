@@ -1,32 +1,51 @@
-import { useEffect } from "react";
-import { requestHandler, styleTrackAuthProvider } from "../util/styleTrackUtil";
+import { Avatar, IconButton, Typography } from "@mui/material";
+import { useLoaderData } from "react-router-dom";
+import { getRandomColor, styleTrackAuthProvider } from "../util/styleTrackUtil";
+import { Settings } from "@mui/icons-material";
 
 export default function ProfilePage() {
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await requestHandler.getRequest(`/users/username/${styleTrackAuthProvider.username}`);
-        console.log(response);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchUserData();
-  }, []);
+  const user = useLoaderData();
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      flexDirection: 'column',
-      height: '100vh', // Full viewport height
-      fontSize: '2rem',
-      fontWeight: 'bold',
-    }}>
-      <h1>ProfilePage</h1>
-      <h2>{styleTrackAuthProvider.username}</h2>
+    <div className="flex flex-col h-[100vh] text-2 text-bold p-8">
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-row">
+          <Avatar
+            alt={user.username.toUpperCase()}
+            sx={{
+              width: 100,
+              height: 100,
+              backgroundColor: getRandomColor(),
+              fontSize: 40,
+            }}
+            src={user.profilePic || "/"}
+          />
+          <div className="ml-10">
+            <Typography variant="h5">
+              {user.displayName || user.username}
+            </Typography>
+            <Typography variant="subtitle1" color="textSecondary">
+              @{user.username}
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              Email address: {user.email}
+            </Typography>
+          </div>
+        </div>
+        {styleTrackAuthProvider.username == user.username && (
+                <IconButton
+                    onClick={() => location.replace(`/profile/${user.username}/settings`)}
+                    sx={{
+                        fontSize: '2rem',
+                        color: '#000',
+                        height: '40px',
+                        width: '40px'
+                    }}
+                >
+                    <Settings sx={{ fontSize: 32 }} />
+                </IconButton>
+            )}
+      </div>
     </div>
-  )
+  );
 }
