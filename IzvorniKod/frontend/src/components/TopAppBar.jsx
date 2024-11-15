@@ -37,6 +37,8 @@ export default function ResponsiveAppBar() {
         {!isMobile && (
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
             <Button color="inherit"><a href='/'>Home</a></Button>
+            <Button color="inherit" onClick={() => location.assign(`/wardrobes?user=${styleTrackAuthProvider.username}`)}>My Wardrobes</Button>
+            <Button color="inherit"><a href='/'>Search</a></Button>
           </Box>
         )}
 
@@ -46,7 +48,7 @@ export default function ResponsiveAppBar() {
         }
 
         {
-          styleTrackAuthProvider.isAuthenticated && (
+          styleTrackAuthProvider.isAuthenticated && !isMobile && (
             <div className='flex flex-row'>
               {
               styleTrackAuthProvider.username && 
@@ -81,10 +83,12 @@ export default function ResponsiveAppBar() {
             horizontal: 'right',
           }}
         >
-          <MenuItem onClick={handleMenuClose}>Home</MenuItem>
-          <MenuItem onClick={handleMenuClose}>About</MenuItem>
-          <MenuItem onClick={handleMenuClose}>Services</MenuItem>
-          <MenuItem onClick={handleMenuClose}>Contact</MenuItem>
+          <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign("/")}>Home</MenuItem>
+          <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign(`/wardrobes?user=${styleTrackAuthProvider.username}`)}>My Wardrobes</MenuItem>
+          <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign("/")}>Search</MenuItem>
+          {styleTrackAuthProvider.isAuthenticated && <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign("/profile")}>Profile</MenuItem>}
+          {styleTrackAuthProvider.isAuthenticated ? <MenuItem onClick={handleMenuClose} onMouseUp={() => styleTrackAuthProvider.logOut()}>Logout</MenuItem> : <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign("/login")}>Login</MenuItem>}
+          
         </Menu>
       </Toolbar>
     </AppBar>

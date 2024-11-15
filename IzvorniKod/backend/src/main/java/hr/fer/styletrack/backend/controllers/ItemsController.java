@@ -37,12 +37,7 @@ public class ItemsController {
             if (section.isPresent()) {
                 if (section.get().getWardrobe().isPublic() || section.get().getWardrobe().getUser().getUsername().equals(authenticatedPrincipal.getUsername())) {
                     return ResponseEntity.ok(section.get().getItems().stream()
-                            .map(item -> new ItemDto(
-                                    sectionId,
-                                    item.getItemId(),
-                                    item.getItemName(),
-                                    item.getItemTags()
-                            )).collect(Collectors.toList()));
+                            .map(ItemDto::new).collect(Collectors.toList()));
                 } else {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
                 }
@@ -87,6 +82,8 @@ public class ItemsController {
                 Item newItem = new Item();
                 newItem.setItemName(itemDto.getItemName());
                 newItem.setItemTags(itemDto.getItemTags());
+                newItem.setCategory(itemDto.getCategory());
+                newItem.setDescription(itemDto.getDescription());
                 newItem.setSection(parentSection);
                 itemRepository.save(newItem);
                 return ResponseEntity.ok(new ItemDto(newItem));
