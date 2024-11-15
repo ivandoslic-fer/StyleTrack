@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+  <help_text/>
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>140</x>
+      <y>50</y>
+      <w>220</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>User
+--
+-id: Long
+-username: String
+-password: String
+-email: String
+-isAdvertiser: boolean
+-displayName: String
+--
+wardrobes: Collection&lt;Wardrobe&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>170</x>
+      <y>250</y>
+      <w>220</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>Wardrobe
+--
+-wardrobeId: Long
+-wardrobeName: String
+-isPublic: boolean
+-user: User
+--
+sections: Collection&lt;Section&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>100</x>
+      <y>170</y>
+      <w>90</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+m1=1..n</panel_attributes>
+    <additional_attributes>70.0;80.0;10.0;80.0;10.0;10.0;40.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>420</x>
+      <y>10</y>
+      <w>160</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>AdvertiserProfile
+--
+-id: Long
+-user: User
+-companyAdress: String
+-companyEmail: String</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>350</x>
+      <y>50</y>
+      <w>90</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+m1=0..1</panel_attributes>
+    <additional_attributes>10.0;10.0;70.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>200</x>
+      <y>380</y>
+      <w>170</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>Section
+--
+-sectionId: Long
+-sectionName: String
+-wardrobe: Wardrobe
+--
+items: Collection&lt;Item&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>130</x>
+      <y>340</y>
+      <w>90</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+m1=1..n</panel_attributes>
+    <additional_attributes>70.0;60.0;10.0;60.0;10.0;10.0;40.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>230</x>
+      <y>500</y>
+      <w>190</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>Item
+--
+-itemId: Long
+-itemName: String
+-itemTags: Collection&lt;Item&gt;
+--
+section: Section</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>160</x>
+      <y>460</y>
+      <w>90</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m1=1..n</panel_attributes>
+    <additional_attributes>70.0;50.0;10.0;50.0;10.0;10.0;40.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>650</x>
+      <y>100</y>
+      <w>130</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>LoginRequest
+--
+-username: String
+-password: String</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>650</x>
+      <y>190</y>
+      <w>130</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>LoginResponse
+--
+-token: String
+-username: String
+-user: UserDto</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>620</x>
+      <y>280</y>
+      <w>160</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>RegisterRequest
+--
+-username: String
+-password: String
+-email: String
+-displayName: String
+-address: String
+-companyEmail: String
+-advertiser: boolean</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>350</x>
+      <y>130</y>
+      <w>320</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+UserDto</panel_attributes>
+    <additional_attributes>10.0;10.0;60.0;10.0;60.0;130.0;300.0;130.0</additional_attributes>
+  </element>
+</diagram>
