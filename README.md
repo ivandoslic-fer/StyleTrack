@@ -1,7 +1,9 @@
 # Programsko inženjerstvo (StyleTrack)
 
 # Opis projekta
-Ovaj projekt je rezultat timskog rada u sklopu projektnog zadatka kolegija [Programsko inženjerstvo](https://www.fer.unizg.hr/predmet/proinz) na Fakultetu elektrotehnike i računarstva Sveučilišta u Zagrebu. 
+Ovaj projekt je rezultat timskog rada u sklopu projektnog zadatka kolegija [Programsko inženjerstvo](https://www.fer.unizg.hr/predmet/proinz) na Fakultetu elektrotehnike i računarstva Sveučilišta u Zagrebu.
+
+Aplikacija je službeno objavljena na [ovoj stranici](https://styletrack.onrender.com/) [**UPOZORENJE!** Zbog "cold starta" backend servera koji koristimo prolazak prvog zahtjeva (najčešće prijave) trenutno može potrajati podosta. Ispričavamo se pokušati ćemo naše usluge ubrzati u što kraćem roku.]
 
 Ova aplikacija omogućuje korisnicima upravljanje stvarima u svojim ormarima, dijeljenje odjevnih predmeta s drugim korisnicima u blizini te pregled ponuda oglašivača. Korisnici koristeći mapu unutar aplikacije mogu vidjeti javne ormare drugih korisnika u stvarnom vremenu. Aplikacija je istovremeno korisna za organizaciju i za razmjenu stvari s drugim korisnicima. Projekt obuhvaća funkcionalne i nefunkcionalne zahtjeve koji omogućuju jednostavno korištenje, skalabilnost i proširivost aplikacije.
 
