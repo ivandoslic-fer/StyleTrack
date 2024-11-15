@@ -53,7 +53,7 @@ const WardrobeCard = ({ wardrobe }) => {
           }}
           onClick={() => location.assign(`/wardrobes/${wardrobe.wardrobeId}`)}
         >
-          ?? Items
+          Open
         </Button>
       </CardContent>
     </Card>
