@@ -3,7 +3,7 @@ import { AppBar, Toolbar, IconButton, Typography, Button, Menu, MenuItem, Box, A
 import { Menu as MenuIcon } from '@mui/icons-material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
-import { styleTrackAuthProvider } from '../util/styleTrackUtil';
+import { getRandomColor, styleTrackAuthProvider } from '../util/styleTrackUtil';
 
 export default function ResponsiveAppBar() {
   const theme = useTheme();
@@ -25,18 +25,11 @@ export default function ResponsiveAppBar() {
     location.replace("/");
   }
 
-  const getRandomColor = () => {
-    // Define an array of background colors
-    const colors = ["#FF5733", "#33FF57", "#3357FF", "#FF33A5", "#FFC300", "#DAF7A6", "#900C3F", "#581845"];
-    // Pick a random color from the array
-    return colors[Math.floor(Math.random() * colors.length)];
-  }
-
   return (
     <AppBar position="static" color="transparent" sx={{ boxShadow: "none" }}>
       <Toolbar sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
         {/* Logo */}
-        <Typography variant="h6" component="div" sx={{ }}>
+        <Typography variant="h6" component="div" onClick={() => location.replace("/")}>
           <img src="/path/to/logo.png" alt="StyleTrack" style={{ height: '40px' }} />
         </Typography>
 

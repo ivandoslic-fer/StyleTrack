@@ -17,4 +17,14 @@ public class UserDto {
         this.email = email;
         this.displayName = displayName;
     }
+
+    @Override
+    public String toString() {
+        return "{"
+                + "        \"id\":\"" + id + "\""
+                + ",         \"username\":\"" + username + "\""
+                + ",         \"email\":\"" + email + "\""
+                + ",         \"displayName\":\"" + displayName + "\""
+                + "}";
+    }
 }

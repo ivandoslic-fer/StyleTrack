@@ -8,6 +8,7 @@ import LoginPage from "../pages/LoginPage";
 import ProfilePage from "../pages/ProfilePage";
 import RegisterPage from "../pages/RegisterPage";
 import OAuth2RedirectHandler from '../pages/OAuthRedirect';
+import ProfileSettingsPage from '../pages/ProfileSettingsPage';
 
 const BACKEND_URL = "https://styletrack-backend-stage.onrender.com/api";
 
@@ -83,51 +84,6 @@ export const styleTrackAuthProvider = {
 // Initialize authentication state by loading token and username from storage
 styleTrackAuthProvider.loadToken();
 
-async function loginLoader() {
-    if (styleTrackAuthProvider.isAuthenticated) {
-      return redirect("/");
-    }
-    return null;
-}
-
-function protectedLoader({ request }) {
-    if (!styleTrackAuthProvider.isAuthenticated) {
-        let params = new URLSearchParams();
-        params.set("from", new URL(request.url).pathname);
-        return redirect("/login?" + params.toString());
-    }
-    return null;
-}
-
-export const router = createBrowserRouter([
-    {
-        path: "/",
-        Component: HomePage,
-        loader: () => {
-            return { user: styleTrackAuthProvider.username }
-        }
-    },
-    {
-        path: "/login",
-        loader: loginLoader,
-        Component: LoginPage
-    },
-    {
-        path: "/register",
-        loader: loginLoader,
-        Component: RegisterPage
-    },
-    {
-        path: "/profile",
-        loader: protectedLoader,
-        Component: ProfilePage
-    },
-    {
-        path: "/oauth2/redirect",
-        Component: OAuth2RedirectHandler
-    }
-]);
-
 export const requestHandler = {
     postRequest: async (url, payload) => {
         try {
@@ -169,4 +125,96 @@ export const requestHandler = {
             throw new Error("PUT request failed (Probably unauthorized)"); // TODO: Handle this better
         }
     }
+}
+
+async function loginLoader() {
+    if (styleTrackAuthProvider.isAuthenticated) {
+      return redirect("/");
+    }
+    return null;
+}
+
+/*function protectedLoader({ request }) {
+    if (!styleTrackAuthProvider.isAuthenticated) {
+        let params = new URLSearchParams();
+        params.set("from", new URL(request.url).pathname);
+        return redirect("/login?" + params.toString());
+    }
+    return null;
+}*/
+
+async function profileLoader({ request }) {
+    const url = new URL(request.url);
+    if (!styleTrackAuthProvider.isAuthenticated) {
+        // Redirect unauthenticated users to login
+        const params = new URLSearchParams();
+        params.set("from", url.pathname);
+        return redirect(`/login?${params.toString()}`);
+    }
+
+    // If the current path is `/profile`, redirect to `/profile/:username`
+    if (url.pathname === "/profile") {
+        return redirect(`/profile/${styleTrackAuthProvider.username}`);
+    }
+
+    // Otherwise, allow navigation to the specific profile page
+    return null;
+}
+
+async function loadProfile(username) {
+    console.log("Returning data for username: " + username);
+    const response = await (requestHandler.getRequest(`/users/username/${username}`));
+    return response.data;
+}
+
+export const router = createBrowserRouter([
+    {
+        path: "/",
+        Component: HomePage,
+        loader: () => {
+            return { user: styleTrackAuthProvider.username }
+        }
+    },
+    {
+        path: "/login",
+        loader: loginLoader,
+        Component: LoginPage
+    },
+    {
+        path: "/register",
+        loader: loginLoader,
+        Component: RegisterPage
+    },
+    {
+        path: "/profile",
+        loader: profileLoader,
+        children: [
+            {
+                path: ":username",
+                loader: async ({ params }) => {
+                    return loadProfile(params.username);
+                },
+                Component: ProfilePage,
+            }
+        ]
+    },
+    {
+        path: "/profile/:username/settings",
+        loader: async ({ params }) => {
+            if (params.username !== styleTrackAuthProvider.username) return redirect(`/profile/${params.username}`);
+            return loadProfile(params.username);
+        },
+        Component: ProfileSettingsPage
+    },
+    {
+        path: "/oauth2/redirect",
+        Component: OAuth2RedirectHandler
+    }
+]);
+
+export const getRandomColor = () => {
+    // Define an array of background colors
+    const colors = ["#FF5733", "#33FF57", "#3357FF", "#FF33A5", "#FFC300", "#DAF7A6", "#900C3F", "#581845"];
+    // Pick a random color from the array
+    return colors[Math.floor(Math.random() * colors.length)];
 }

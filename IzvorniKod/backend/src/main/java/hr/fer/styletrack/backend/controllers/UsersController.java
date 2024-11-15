@@ -56,17 +56,15 @@ public class UsersController {
             return ResponseEntity.notFound().build();
         }
 
+        System.out.println(userDto);
+
         user.get().setEmail(userDto.getEmail());
         user.get().setDisplayName(userDto.getDisplayName());
         user.get().setUsername(userDto.getUsername());
 
         userRepository.save(user.get());
 
-        if (user.isPresent()) {
-            return ResponseEntity.ok(new UserDto(user.get().getId(), user.get().getUsername(), user.get().getEmail(), user.get().getDisplayName()));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(new UserDto(user.get().getId(), user.get().getUsername(), user.get().getEmail(), user.get().getDisplayName()));
     }
 
     @DeleteMapping("/{id}")
