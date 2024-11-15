@@ -17,7 +17,7 @@ import SectionPage from '../pages/SectionPage';
 import CreateItemPage from '../pages/CreateItemPage';
 
 
-const BACKEND_URL = "https://styletrack-backend-stage.onrender.com/api";
+const BACKEND_URL = "https://styletrack-backend.onrender.com/api";
 
 export const styleTrackAuthProvider = {
     isAuthenticated: false,
