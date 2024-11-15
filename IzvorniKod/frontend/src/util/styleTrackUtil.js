@@ -9,6 +9,7 @@ import ProfilePage from "../pages/ProfilePage";
 import RegisterPage from "../pages/RegisterPage";
 import OAuth2RedirectHandler from '../pages/OAuthRedirect';
 import ProfileSettingsPage from '../pages/ProfileSettingsPage';
+import WardrobesPage from '../pages/WardrobesPage';
 
 const BACKEND_URL = "https://styletrack-backend-stage.onrender.com/api";
 
@@ -205,6 +206,10 @@ export const router = createBrowserRouter([
             return loadProfile(params.username);
         },
         Component: ProfileSettingsPage
+    },
+    {
+        path: "/wardrobes",
+        Component: WardrobesPage
     },
     {
         path: "/oauth2/redirect",

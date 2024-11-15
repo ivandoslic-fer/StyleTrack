@@ -1,15 +1,10 @@
 import { Avatar, IconButton, Typography } from "@mui/material";
-import { useEffect } from "react";
 import { useLoaderData } from "react-router-dom";
 import { getRandomColor, styleTrackAuthProvider } from "../util/styleTrackUtil";
 import { Settings } from "@mui/icons-material";
 
 export default function ProfilePage() {
   const user = useLoaderData();
-
-  useEffect(() => {
-    console.log(user);
-  }, []);
 
   return (
     <div className="flex flex-col h-[100vh] text-2 text-bold p-8">
