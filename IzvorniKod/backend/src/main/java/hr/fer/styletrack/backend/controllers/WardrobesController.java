@@ -37,7 +37,8 @@ public class WardrobesController {
         System.out.println(username);
         System.out.println(forSharing);
 
-        if (forSharing != null && forSharing && (username.isEmpty())) {
+        if (forSharing != null && forSharing && username.isEmpty()) {
+            System.out.println("RETURN 1");
             return ResponseEntity.ok(wardrobeRepository.getWardrobesByIsPublicIsTrue().stream()
                     .map(wardrobe -> new WardrobeDto(
                             wardrobe.getUser().getId(),
@@ -51,9 +52,11 @@ public class WardrobesController {
             Optional<User> user = userRepository.findByUsername(username);
 
             if (user.isEmpty()) {
+                System.out.println("RETURN 2");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
 
+            System.out.println("RETURN 3");
             return ResponseEntity.ok(user.get().getWardrobes().stream()
                     .filter(Wardrobe::isPublic)
                     .map(WardrobeDto::new).collect(Collectors.toList()));
@@ -64,13 +67,19 @@ public class WardrobesController {
             Optional<User> user = userRepository.findByUsername(username);
 
             if (user.isEmpty()) {
+                System.out.println("RETURN 4");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
 
+            System.out.println("RETURN 5");
+            for (Wardrobe wardrobe : user.get().getWardrobes()) {
+                System.out.println(wardrobe.getWardrobeName());
+            }
             return ResponseEntity.ok(user.get().getWardrobes().stream()
                     .map(WardrobeDto::new).collect(Collectors.toList()));
         }
 
+        System.out.println("RETURN 6");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 

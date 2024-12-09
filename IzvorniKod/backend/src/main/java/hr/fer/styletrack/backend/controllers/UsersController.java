@@ -2,12 +2,14 @@ package hr.fer.styletrack.backend.controllers;
 
 import hr.fer.styletrack.backend.dtos.UserDto;
 import hr.fer.styletrack.backend.entities.User;
+import hr.fer.styletrack.backend.misc.StyleTrackUserDetails;
 import hr.fer.styletrack.backend.repos.IUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -77,5 +79,17 @@ public class UsersController {
         }
         userRepository.delete(user.get());
         return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully");
+    }
+    
+    @GetMapping("/current")
+    @PreAuthorize("principal.username != null")
+    public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal) {
+        if (authenticatedPrincipal.user == null) return ResponseEntity.internalServerError().build();
+
+        User user = userRepository.findById(authenticatedPrincipal.user.getId()).orElse(null);
+
+        if (user == null) return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getDisplayName()));
     }
 }

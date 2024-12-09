@@ -19,7 +19,7 @@ public class JwtUtil {
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 2))
                 .signWith(SignatureAlgorithm.HS256, SECRET)
-                .claim("user-details", new StyleTrackUserDetails(user))
+                .claim("email", user.getEmail())
                 .compact();
     }
 

@@ -6,7 +6,6 @@ export default function SectionPage() {
   const { wardrobeId, sectionId } = useParams();
 
   const textStyle = {
-    fontFamily: "Roboto, sans-serif",
     fontSize: "18px",
     fontWeight: 500,
     lineHeight: "22px",

@@ -5,7 +5,6 @@ export default function ClosetPage() {
   const data = useLoaderData();
 
   const textStyle = {
-    fontFamily: "Roboto, sans-serif",
     fontSize: "18px",
     fontWeight: 500,
     lineHeight: "22px",
@@ -27,7 +26,6 @@ export default function ClosetPage() {
         justifyContent: "flex-start",
         alignItems: "center",
         minHeight: "100vh",
-        fontFamily: "Roboto",
         paddingTop: "20px",
       }}
     >

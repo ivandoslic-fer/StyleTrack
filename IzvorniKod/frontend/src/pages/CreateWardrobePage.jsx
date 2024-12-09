@@ -1,8 +1,10 @@
 import { Button, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { requestHandler, styleTrackAuthProvider } from "../util/styleTrackUtil";
+import { useLoaderData } from "react-router-dom";
 
 export default function CreateWardrobePage() {
+  const user = useLoaderData();
   const [formData, setFormData] = useState({
     wardobeName: "",
     // tags: []
@@ -17,13 +19,13 @@ export default function CreateWardrobePage() {
     e.preventDefault();
 
     const newWardrobe = {
-        ownerId: styleTrackAuthProvider.userData.id,
+        ownerId: user.id,
         wardrobeName: formData.wardobeName
     };
 
     await requestHandler.postRequest(`/wardrobes/new`, newWardrobe);
 
-    location.replace(`/wardrobes?user=${styleTrackAuthProvider.username}`);
+    location.replace(`/wardrobes?user=${user.username}`);
   };
 
   return (

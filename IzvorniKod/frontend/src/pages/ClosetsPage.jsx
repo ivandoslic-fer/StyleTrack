@@ -1,10 +1,12 @@
 import { Container, Box, Typography, Button, CircularProgress } from '@mui/material';
 import WardrobeCard from '../components/WardrobeCard';
-import { useSearchParams } from 'react-router-dom';
+import { useLoaderData, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { requestHandler, styleTrackAuthProvider } from '../util/styleTrackUtil';
+import EmptyPage from './EmptyPage';
 
 export default function ClosetsPage() {
+    const user = useLoaderData();
     const [wardrobes, setWardrobes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchParams] = useSearchParams();
@@ -17,9 +19,9 @@ export default function ClosetsPage() {
                 const showPublic = searchParams.get('public');
                 let response;
 
-                if (username && username === styleTrackAuthProvider.username && !(showPublic === 'true')) {
+                if (username && username === user.username && !(showPublic === 'true')) {
                     response = await requestHandler.getRequest(`/wardrobes/?username=${username}&forSharing=false`);
-                } else if (username && username !== styleTrackAuthProvider.username) {
+                } else if (username && username !== user.username) {
                     response = await requestHandler.getRequest(`/wardrobes/?username=${username}&forSharing=true`);
                 } else {
                     response = await requestHandler.getRequest(`/wardrobes/?username=&forSharing=true`);
@@ -42,6 +44,12 @@ export default function ClosetsPage() {
         location.assign("/wardrobes/create");
     };
 
+    if (!wardrobes || wardrobes.length == 0) {
+        return (
+            <EmptyPage />
+        );
+    }
+
     return (
         <Container
             sx={{
@@ -50,7 +58,6 @@ export default function ClosetsPage() {
                 justifyContent: 'flex-start',
                 marginLeft: '0px',
                 minHeight: '100vh',
-                fontFamily: 'Roboto',
                 width: '100svw',
                 marginRight: 0,
                 paddingTop: 0,
@@ -86,6 +93,7 @@ export default function ClosetsPage() {
                     }}
                 >
                     {/* Card for Creating New Wardrobe */}
+                    { (searchParams.get('user') === user.username) && (
                     <Box
                         sx={{
                             display: 'flex',
@@ -109,7 +117,6 @@ export default function ClosetsPage() {
                         <Typography
                             variant="h6"
                             sx={{
-                                fontFamily: 'Roboto, sans-serif',
                                 fontSize: '20px',
                                 fontWeight: 500,
                                 textAlign: 'center',
@@ -130,7 +137,7 @@ export default function ClosetsPage() {
                         >
                             Create
                         </Button>
-                    </Box>
+                    </Box>) }
 
                     {/* Existing Wardrobes */}
                     {wardrobes.map((closet, index) => (

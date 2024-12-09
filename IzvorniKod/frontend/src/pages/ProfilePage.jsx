@@ -2,9 +2,27 @@ import { Avatar, IconButton, Typography } from "@mui/material";
 import { useLoaderData } from "react-router-dom";
 import { getRandomColor, styleTrackAuthProvider } from "../util/styleTrackUtil";
 import { Settings } from "@mui/icons-material";
+import { useEffect, useState } from "react";
 
 export default function ProfilePage() {
   const user = useLoaderData();
+  const [canEdit, setCanEdit] = useState(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (styleTrackAuthProvider.isAuthenticated) {
+        try {
+          const result = await styleTrackAuthProvider.getCurrentUser();
+          
+          setCanEdit(result.username === user.username);
+        } catch (error) {
+          console.error("Failed to fetch user:", error);
+        }
+      }
+    };
+  
+    fetchUser();
+  }, []);
 
   return (
     <div className="flex flex-col h-[100vh] text-2 text-bold p-8">
@@ -32,7 +50,7 @@ export default function ProfilePage() {
             </Typography>
           </div>
         </div>
-        {styleTrackAuthProvider.username == user.username && (
+        {canEdit && (
                 <IconButton
                     onClick={() => location.replace(`/profile/${user.username}/settings`)}
                     sx={{

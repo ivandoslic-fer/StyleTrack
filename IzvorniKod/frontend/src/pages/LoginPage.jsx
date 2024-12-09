@@ -79,16 +79,17 @@ export default function LoginPage() {
         {/* SSO Buttons */}
         <Button
           variant="outlined"
-          disabled={true}
           startIcon={<Google />}
           fullWidth
           sx={{ marginBottom: 1 }}
+          onClick={() => {
+            styleTrackAuthProvider.googleLogin();
+          }}
         >
           Sign in with Google
         </Button>
         <Button
           variant="outlined"
-          disabled={true}
           startIcon={<GitHub />}
           sx={{ marginBottom: 1 }}
           fullWidth
