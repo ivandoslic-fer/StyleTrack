@@ -10,8 +10,9 @@ export default function ProfileSettingsPage() {
     username: user.username,
     email: user.email,
     displayName: user.displayName,
-    profilePic: user.profilePic,
   });
+
+  const [uploadedFile, setUploadedFile] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,11 +22,7 @@ export default function ProfileSettingsPage() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setFormData({ ...formData, profilePic: reader.result });
-      };
-      reader.readAsDataURL(file);
+      setUploadedFile(file);
     }
   };
 
@@ -41,6 +38,22 @@ export default function ProfileSettingsPage() {
 
     await requestHandler.putRequest(`/users/${user.id}`, newUserData);
 
+    if (uploadedFile) {
+      // Create FormData and append the file
+      const formData = new FormData();
+      formData.append("file", uploadedFile); // Pass the file object here
+      formData.append("fileName", uploadedFile.name);
+
+      // Make the image upload request
+      const response = await requestHandler.imagePostRequest(
+        "/users/profileImage/upload",
+        formData
+      );
+
+      // Save new profile picture URL
+      newUserData.profilePictureUrl = response.data.profilePictureUrl;
+    }
+
     localStorage.setItem('userData', JSON.stringify(newUserData));
 
     location.replace(`/profile/${user.username}`);
@@ -49,6 +62,7 @@ export default function ProfileSettingsPage() {
   return (
     <div className="bg-gray-100 py-6 px-4 md:flex md:justify-center md:items-center md:h-screen">
       <div className="md:bg-white p-6 rounded-lg md:shadow-lg w-full md:max-w-md md:flex-grow">
+        <a>{ JSON.stringify(user) }</a>
         <Typography variant="h5" className="text-center mb-4">
           Profile Settings
         </Typography>
@@ -56,7 +70,7 @@ export default function ProfileSettingsPage() {
           <div className="flex justify-center">
             <Avatar
               alt={formData.username.toUpperCase()}
-              src={formData.profilePic || "/"}
+              src={user.profilePictureUrl || "/"}
               sx={{
                 width: 80,
                 height: 80,
@@ -66,7 +80,7 @@ export default function ProfileSettingsPage() {
             />
           </div>
           <div className="flex justify-center">
-            <Button variant="outlined" component="label" disabled={true}>
+            <Button variant="outlined" component="label">
               Upload New Picture
               <input
                 type="file"

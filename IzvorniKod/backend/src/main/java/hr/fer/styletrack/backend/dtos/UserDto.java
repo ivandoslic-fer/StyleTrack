@@ -10,12 +10,14 @@ public class UserDto {
     private String username;
     private String email;
     private String displayName;
+    private String profilePictureUrl;
 
-    public UserDto(Long id, String username, String email, String displayName) {
+    public UserDto(Long id, String username, String email, String displayName, String profilePictureUrl) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.displayName = displayName;
+        this.profilePictureUrl = profilePictureUrl;
     }
 
     @Override
@@ -25,6 +27,7 @@ public class UserDto {
                 + ",         \"username\":\"" + username + "\""
                 + ",         \"email\":\"" + email + "\""
                 + ",         \"displayName\":\"" + displayName + "\""
+                + ",         \"profilePictureUrl\":\"" + profilePictureUrl + "\""
                 + "}";
     }
 }

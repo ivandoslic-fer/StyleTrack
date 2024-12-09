@@ -36,7 +36,7 @@ export default function ProfilePage() {
               backgroundColor: getRandomColor(),
               fontSize: 40,
             }}
-            src={user.profilePic || "/"}
+            src={user.profilePictureUrl || "/"}
           />
           <div className="ml-10">
             <Typography variant="h5">

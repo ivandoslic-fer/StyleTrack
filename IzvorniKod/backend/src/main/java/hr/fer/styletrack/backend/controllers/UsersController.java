@@ -4,6 +4,7 @@ import hr.fer.styletrack.backend.dtos.UserDto;
 import hr.fer.styletrack.backend.entities.User;
 import hr.fer.styletrack.backend.misc.StyleTrackUserDetails;
 import hr.fer.styletrack.backend.repos.IUserRepository;
+import hr.fer.styletrack.backend.services.ImagekitService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,9 +14,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
@@ -24,11 +27,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class UsersController {
 
     private final IUserRepository userRepository;
+    private final ImagekitService imagekitService;
 
     @GetMapping("/")
     public ResponseEntity<List<UserDto>> getUsers() {
         List<User> users = userRepository.findAll();
-        List<UserDto> userDtos = users.stream().map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getDisplayName())).toList();
+        List<UserDto> userDtos = users.stream().map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getDisplayName(), user.getProfilePicture())).toList();
         return ResponseEntity.ok(userDtos);
     }
 
@@ -36,7 +40,7 @@ public class UsersController {
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
-            return ResponseEntity.ok(new UserDto(user.get().getId(), user.get().getUsername(), user.get().getEmail(), user.get().getDisplayName()));
+            return ResponseEntity.ok(new UserDto(user.get().getId(), user.get().getUsername(), user.get().getEmail(), user.get().getDisplayName(), user.get().getProfilePicture()));
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -45,7 +49,7 @@ public class UsersController {
     @GetMapping("/username/{username}")
     public ResponseEntity<UserDto> getUserByUsername(@PathVariable String username) {
         Optional<User> user = userRepository.findByUsername(username); // Assuming this method exists in the repository
-        return user.map(value -> ResponseEntity.ok(new UserDto(value.getId(), value.getUsername(), value.getEmail(), user.get().getDisplayName())))
+        return user.map(value -> ResponseEntity.ok(new UserDto(value.getId(), value.getUsername(), value.getEmail(), user.get().getDisplayName(), user.get().getProfilePicture())))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -66,7 +70,7 @@ public class UsersController {
 
         userRepository.save(user.get());
 
-        return ResponseEntity.ok(new UserDto(user.get().getId(), user.get().getUsername(), user.get().getEmail(), user.get().getDisplayName()));
+        return ResponseEntity.ok(new UserDto(user.get().getId(), user.get().getUsername(), user.get().getEmail(), user.get().getDisplayName(), user.get().getProfilePicture()));
     }
 
     @DeleteMapping("/{id}")
@@ -90,6 +94,44 @@ public class UsersController {
 
         if (user == null) return ResponseEntity.notFound().build();
 
-        return ResponseEntity.ok(new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getDisplayName()));
+        return ResponseEntity.ok(new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getDisplayName(), user.getProfilePicture()));
+    }
+
+    @PostMapping("/profileImage/upload")
+    @PreAuthorize("principal.username != null")
+    public ResponseEntity<UserDto> uploadImage(
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal) {
+        try {
+            // Check the file and user
+            if (file.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            var user = userRepository.findByUsername(authenticatedPrincipal.user.getUsername());
+            if (user.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            // Upload image to ImageKit
+            String imageUrl = imagekitService.uploadImage(file);
+
+            // Save the image URL to the user's profile
+            var userObj = user.get();
+            userObj.setProfilePicture(imageUrl);
+            userRepository.save(userObj);
+
+            // Return updated user profile
+            return ResponseEntity.ok(new UserDto(
+                    userObj.getId(),
+                    userObj.getUsername(),
+                    userObj.getEmail(),
+                    userObj.getDisplayName(),
+                    userObj.getProfilePicture()
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

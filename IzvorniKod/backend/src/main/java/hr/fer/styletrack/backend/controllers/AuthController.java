@@ -69,7 +69,7 @@ public class AuthController {
 
             // Generate JWT
             String jwt = jwtUtil.generateToken(loginRequest.getUsername(), user.get());
-            return ResponseEntity.ok(new LoginResponse(jwt, loginRequest.getUsername(), new UserDto(user.get().getId(), user.get().getUsername(), user.get().getEmail(), user.get().getDisplayName())));  // Return the token
+            return ResponseEntity.ok(new LoginResponse(jwt, loginRequest.getUsername(), new UserDto(user.get().getId(), user.get().getUsername(), user.get().getEmail(), user.get().getDisplayName(), user.get().getProfilePicture())));  // Return the token
 
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");

@@ -74,7 +74,7 @@ export default function ResponsiveAppBar() {
               user &&
               user.username && 
               <div onClick={() => {location.replace("/profile")}} className='cursor-pointer'>
-                <Avatar alt={user.username.toUpperCase()} sx={{ backgroundColor: getRandomColor() }} src={styleTrackAuthProvider.profilePic || "/"}/>
+                <Avatar alt={user.username.toUpperCase()} sx={{ backgroundColor: getRandomColor() }} src={user.profilePictureUrl || "/"}/>
               </div>  
               }
               <Button color="inherit" sx={{ marginLeft: '10px' }} onClick={handleLogout}>Logout</Button>

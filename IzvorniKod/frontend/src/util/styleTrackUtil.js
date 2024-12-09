@@ -116,6 +116,14 @@ export const requestHandler = {
         } catch (error) {
             handleAuthError(error, false);
         }
+    },
+    imagePostRequest: async (url, payload) => {
+        try {
+            const response = await axios.post(`${BACKEND_URL}${url}`, payload, { headers: getMultipartHeaders() });
+            return response;
+        } catch (error) {
+            handleAuthError(error, false);
+        }
     }
 };
 
@@ -126,6 +134,15 @@ const getHeaders = () =>  {
         "Authorization": `Bearer ${styleTrackAuthProvider.token}`,
     }) : ({
         "Content-type": "application/json",
+    })
+};
+
+const getMultipartHeaders = () => {
+    return styleTrackAuthProvider.isAuthenticated ? ({
+        "Content-type": "multipart/form-data",
+        "Authorization": `Bearer ${styleTrackAuthProvider.token}`,
+    }) : ({
+        "Content-type": "multipart/form-data",
     })
 };
 
