@@ -6,6 +6,7 @@ import hr.fer.styletrack.backend.entities.Section;
 import hr.fer.styletrack.backend.entities.User;
 import hr.fer.styletrack.backend.entities.Wardrobe;
 import hr.fer.styletrack.backend.misc.StyleTrackUserDetails;
+import hr.fer.styletrack.backend.repos.ICategoryRepository;
 import hr.fer.styletrack.backend.repos.IItemRepository;
 import hr.fer.styletrack.backend.repos.ISectionRepository;
 import hr.fer.styletrack.backend.repos.IUserRepository;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 @RequestMapping("/api/items")
 public class ItemsController {
+    private final ICategoryRepository categoryRepository;
     private final ISectionRepository sectionRepository;
     private final IItemRepository itemRepository;
 
@@ -82,7 +84,7 @@ public class ItemsController {
                 Item newItem = new Item();
                 newItem.setItemName(itemDto.getItemName());
                 newItem.setItemTags(itemDto.getItemTags());
-                newItem.setCategory(itemDto.getCategory());
+                newItem.setCategory(categoryRepository.findById(itemDto.getCategoryId()).orElse(null));
                 newItem.setDescription(itemDto.getDescription());
                 newItem.setSection(parentSection);
                 itemRepository.save(newItem);

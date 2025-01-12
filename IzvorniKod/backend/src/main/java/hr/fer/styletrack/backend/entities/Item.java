@@ -18,7 +18,6 @@ public class Item {
 
     private String itemName;
     private String description;
-    private String category; // We need to refactor this to be an entity of itself
     private Collection<String> itemTags;
 
     public Item(){ }
@@ -27,5 +26,8 @@ public class Item {
     @JoinColumn(name = "section_id")
     @JsonBackReference
     private Section section;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 }
 

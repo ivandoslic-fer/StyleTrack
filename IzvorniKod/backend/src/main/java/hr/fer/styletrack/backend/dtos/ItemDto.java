@@ -10,19 +10,19 @@ import lombok.Setter;
 @Setter
 public class ItemDto {
     private Long sectionId;
+    private Long categoryId;
     private Long itemId;
     private String itemName;
-    private String category;
     private String description;
     private Collection<String> itemTags;
 
-    public ItemDto(Long sectionId, Long itemId, String itemName, Collection<String> itemTags, String description, String category) {
+    public ItemDto(Long sectionId, Long categoryId, Long itemId, String itemName, Collection<String> itemTags, String description) {
         this.sectionId = sectionId;
         this.itemId = itemId;
         this.itemName = itemName;
         this.itemTags = itemTags;
         this.description = description;
-        this.category = category;
+        this.categoryId = categoryId;
     }
 
     public ItemDto(Item item) {
@@ -31,7 +31,7 @@ public class ItemDto {
         this.itemName = item.getItemName();
         this.itemTags = item.getItemTags();
         this.description = item.getDescription();
-        this.category = item.getCategory();
+        this.categoryId = item.getCategory().getCategoryId();
     }
 
     @Override
@@ -40,7 +40,7 @@ public class ItemDto {
                 + "        \"sectionId\":\"" + sectionId + "\""
                 + ",         \"itemId\":\"" + itemId + "\""
                 + ",         \"itemName\":\"" + itemName + "\""
-                + ",         \"categoryName\":\"" + category + "\""
+                + ",         \"categoryId\":\"" + categoryId + "\""
                 + ",         \"description\":\"" + description + "\""
                 + ",         \"itemTags\":" + itemTags
                 + "}";
