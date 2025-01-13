@@ -85,6 +85,7 @@ export default function RegisterPage() {
           label="Email"
           variant="outlined"
           type='email'
+          id='email-field'
           fullWidth
           margin="normal"
           value={email}
@@ -93,6 +94,7 @@ export default function RegisterPage() {
         <TextField
           label="Username"
           variant="outlined"
+          id='username-field'
           fullWidth
           margin="normal"
           value={username}
@@ -102,6 +104,7 @@ export default function RegisterPage() {
           label="Password"
           type="password"
           variant="outlined"
+          id='password-field'
           fullWidth
           margin="normal"
           value={password}
@@ -111,6 +114,7 @@ export default function RegisterPage() {
           label="Confirm password"
           type="password"
           variant="outlined"
+          id='conf-password-field'
           fullWidth
           margin="normal"
           value={confPassword}
@@ -121,6 +125,7 @@ export default function RegisterPage() {
           label={userType === 'advertiser' ? "Company Name" : "Display Name"}
           variant="outlined"
           fullWidth
+          id='display-name-field'
           margin="normal"
           value={displayName}
           onChange={e => setDislpayName(e.target.value)}
@@ -152,6 +157,7 @@ export default function RegisterPage() {
         <Button
           variant="contained"
           color="primary"
+          id='signup-button'
           fullWidth
           sx={{ marginTop: 2, marginBottom: 2 }}
           onClick={handleSignUp}

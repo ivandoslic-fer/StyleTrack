@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 public class WardrobeDetailedDto extends WardrobeDto {
     List<SectionDto> sections;
 
-    public WardrobeDetailedDto(Long ownerId, Long wardrobeId, String wardrobeName, Collection<String> tags, List<Section> sections) {
-        super(ownerId, wardrobeId, wardrobeName, tags);
+    public WardrobeDetailedDto(Long ownerId, Long wardrobeId, String wardrobeName, String description, boolean isPublic, Double longitude, Double latitude, List<Section> sections) {
+        super(ownerId, wardrobeId, wardrobeName, description, isPublic, longitude, latitude);
         this.sections = sections.stream().map(SectionDto::new).toList();
     }
 

@@ -1,151 +1,280 @@
-import { Container, Box, Button, Typography, Divider, Avatar, Card } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Paper,
+  TextField,
+  Switch,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TablePagination,
+} from "@mui/material";
+import { useEffect, useState } from "react";
 import { useLoaderData } from "react-router-dom";
+import Minimap from "../components/MiniMap";
+import { getAddressFromCoordinates, requestHandler, styleTrackAuthProvider } from "../util/styleTrackUtil";
+import { useSnackbar } from "../context/SnackbarContext";
 
 export default function ClosetPage() {
   const data = useLoaderData();
 
-  const textStyle = {
-    fontSize: "18px",
-    fontWeight: 500,
-    lineHeight: "22px",
-    textAlign: "left",
-    textUnderlinePosition: "from-font",
-    textDecorationSkipInk: "none",
+  const { showSnackbar } = useSnackbar();
+
+  const [isPublic, setIsPublic] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [wardrobeName, setWardrobeName] = useState("");
+  const [wardrobeDescription, setWardrobeDescription] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState([0, 0]);
+  const [address, setAddress] = useState("");
+  const [originalValues, setOriginalValues] = useState({});
+  const [page, setPage] = useState(0);
+  const [isUsersWardrobe, setIsUsersWardrobe] = useState(false);
+
+  const updateLocation = (lnglat) => {
+    setSelectedLocation(lnglat);
   };
 
-  const handleAddSection = () => {
-    console.log("Navigate to Add Section form");
-    location.assign(`/wardrobes/${data.wardrobeId}/addSection`);
+  const showSuccessSnackbar = () => {
+    showSnackbar({
+      message: "Item updated successfully",
+      severity: "success",
+      duration: 3000
+    })
+  }
+
+  useEffect(() => {
+    setIsPublic(data.public);
+    setWardrobeName(data.wardrobeName);
+    setWardrobeDescription(data.description);
+    if (data.latitude) setSelectedLocation([data.latitude, data.longitude]);
+  }, [data]);
+
+  useEffect(() => {
+    const fetchAddress = async () => {
+      const currentUser = await styleTrackAuthProvider.getCurrentUser()
+      setIsUsersWardrobe(currentUser.id == data.ownerId);
+      if (data.latitude && data.longitude) {
+        const fetchedAddress = await getAddressFromCoordinates(data.latitude, data.longitude);
+        setAddress(fetchedAddress);
+      }
+    };
+
+    fetchAddress();
+  }, [data]);
+
+  const handleEditToggle = async () => {
+    if (!editing) {
+      setOriginalValues({
+        isPublic,
+        wardrobeName,
+        wardrobeDescription,
+        selectedLocation,
+      });
+    } else {
+      const updatedWardrobe = {
+        wardrobeId: data.wardrobeId, // Ensure we keep the ID
+        ownerId: data.ownerId, // Assuming this is part of the initial data
+        wardrobeName,
+        description: wardrobeDescription,
+        public: isPublic,
+        latitude: selectedLocation[0],
+        longitude: selectedLocation[1],
+      };
+
+      try {
+        const result = await requestHandler.putRequest(`/wardrobes/${data.wardrobeId}`, updatedWardrobe);
+
+        if (result.status == 202) showSuccessSnackbar();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    setEditing((prev) => !prev);
   };
+
+  const handleCancel = () => {
+    setIsPublic(originalValues.isPublic);
+    setWardrobeName(originalValues.wardrobeName);
+    setWardrobeDescription(originalValues.wardrobeDescription);
+    setSelectedLocation(originalValues.selectedLocation);
+    setEditing(false);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const sections = data.sections || [];
 
   return (
-    <Container
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        minHeight: "100vh",
-        paddingTop: "20px",
-      }}
-    >
-      <Typography variant="h4" sx={{ marginBottom: "20px", fontWeight: 600 }}>
-        Wardrobe Sections
-      </Typography>
-
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "repeat(1, 1fr)", // 1 column on small screens
-            sm: "repeat(2, 1fr)", // 2 columns on medium screens
-            md: "repeat(3, 1fr)", // 3 columns on larger screens
-          },
-          gap: "20px",
-          width: "100%",
-          maxWidth: "1200px",
-        }}
-      >
-        {/* Add Section Card */}
-        <Card
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            background: "transparent",
-            border: "2px dashed #ccc",
-            borderRadius: "10px",
-            padding: "20px",
-            textAlign: "center",
-            cursor: "pointer",
-            transition: "0.3s",
-            "&:hover": {
-              backgroundColor: "#e5e7eb",
-            },
-            boxShadow: "none"
-          }}
-          onClick={handleAddSection}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontFamily: "Roboto, sans-serif",
-              fontSize: "20px",
-              fontWeight: 500,
-              marginBottom: "10px",
-            }}
-          >
-            Add Section
+    <div className="w-full h-full flex flex-col md:flex-row">
+      <div className="flex-1 p-4">
+        <Paper elevation={3} className="p-6 rounded-lg shadow-md bg-white">
+          <Typography variant="h5" sx={{ fontWeight: "bold" }} className="mb-4 text-center font-bold">
+            Wardrobe Details
           </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{
-              textTransform: "none",
-            }}
-          >
-            Create
-          </Button>
-        </Card>
 
-        {/* Render Wardrobe Sections */}
-        {data.sections.map((section) => (
-          <Box
-            key={section.sectionId}
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "flex-start",
-              alignItems: "center",
-              backgroundColor: "#f5f5f5",
-              borderRadius: "10px",
-              padding: "15px",
-              boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            {/* Section Image */}
-            <Avatar
-              alt={section.sectionName}
-              src={section.image || '/'}
-              sx={{
-                width: 100,
-                height: 100,
-                borderRadius: "10%",
-                border: "1px solid #ddd",
-                boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
-                marginRight: "15px",
-              }}
-            />
-
-            {/* Section Details */}
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="h6" sx={{ ...textStyle, marginBottom: "5px" }}>
-                {section.sectionName}
-              </Typography>
-              <Typography sx={{ ...textStyle, color: "#757575" }}>
-                Type: {section.sectionType}
-              </Typography>
-              <Divider sx={{ marginY: "10px" }} />
-              <Typography sx={{ ...textStyle, fontWeight: 400 }}>
-                Items: ??/{section.sectionCapacity}
-              </Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                size="small"
-                sx={{
-                  marginTop: "10px",
-                  textTransform: "none",
-                }}
-                onClick={() => location.assign(`/wardrobes/${data.wardrobeId}/${section.sectionId}`)}
-              >
-                View Items
-              </Button>
-            </Box>
+          <Box className="mb-4">
+            <Typography variant="body1" className="font-medium">
+              <b>UID:</b> {data.wardrobeId}
+            </Typography>
           </Box>
-        ))}
-      </Box>
-    </Container>
+
+          <Box className="mb-4">
+            <Typography variant="body1" className="font-medium" sx={{ fontWeight: "bold" }}>
+              Name:
+            </Typography>
+            {editing ? (
+              <TextField
+                fullWidth
+                placeholder="My Wardrobe"
+                value={wardrobeName}
+                variant="outlined"
+                onChange={(e) => setWardrobeName(e.target.value)}
+                className="mt-2"
+              />
+            ) : (
+              <Typography className="mt-2 text-gray-700">{wardrobeName}</Typography>
+            )}
+          </Box>
+
+          <Box className="mb-4">
+            <Typography variant="body1" className="font-medium" sx={{ fontWeight: "bold" }}>
+              Description:
+            </Typography>
+            {editing ? (
+              <TextField
+                fullWidth
+                multiline
+                rows={3}
+                placeholder="Description of the wardrobe"
+                value={wardrobeDescription}
+                variant="outlined"
+                onChange={(e) => setWardrobeDescription(e.target.value)}
+                className="mt-2"
+              />
+            ) : (
+              <Typography className="mt-2 text-gray-700">{wardrobeDescription}</Typography>
+            )}
+          </Box>
+
+          <Box className="flex items-center mb-6">
+            <Typography variant="body1" className="font-medium" sx={{ fontWeight: "bold" }}>
+              Public:
+            </Typography>
+            {editing ? (
+              <Switch
+                checked={isPublic}
+                onChange={() => setIsPublic((prev) => !prev)}
+                color="primary"
+                inputProps={{ "aria-label": "toggle public or private" }}
+              />
+            ) : (
+              <Typography className="ml-2 text-gray-700" sx={{ ml: 1 }}>
+                {isPublic ? "Yes" : "No"}
+              </Typography>
+            )}
+          </Box>
+          {data.latitude && (
+          <>
+            <Typography variant="body1" className="font-medium">
+              <b>Location:</b> {editing ? "" : address ? address : "Loading..."}
+            </Typography>
+          
+            <Box className="h-64 bg-gray-200 rounded-md flex items-center justify-center mt-4">
+              <Minimap
+                selectedLocation={selectedLocation}
+                onSelectedLocationChange={updateLocation}
+                displayOnly={!editing}
+              />
+            </Box>
+          </>
+          )}
+
+          <Box className="mt-6 flex justify-end gap-4">
+            {editing && (
+              <Button variant="outlined" color="error" onClick={handleCancel} className="hover:bg-red-500 hover:text-white">
+                Cancel
+              </Button>
+            )}
+            {isUsersWardrobe && (
+              <Button variant="contained" color="primary" onClick={handleEditToggle}>
+                {editing ? "Save" : "Edit"}
+              </Button>
+            )}
+          </Box>
+        </Paper>
+      </div>
+      <div className="flex-1 p-4">
+        <Paper elevation={3} className="p-4 rounded-lg shadow-md bg-white">
+          <Typography variant="h5" sx={{ fontWeight: "bold" }} className="mb-4 text-center">
+            Wardrobe Sections
+          </Typography>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Section Name</TableCell>
+                  <TableCell>Section Type</TableCell>
+                  <TableCell>Capacity</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {/* Create New Section Row */}
+                {/* Render Sections */}
+                {sections
+                  .slice(page * 10, page * 10 + 10)
+                  .map((section) => (
+                    <TableRow key={section.sectionId}>
+                      <TableCell>{section.sectionName}</TableCell>
+                      <TableCell>{section.sectionType}</TableCell>
+                      <TableCell>{section.sectionCapacity}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          onClick={() =>
+                            location.assign(`/wardrobes/${section.wardrobeId}/${section.sectionId}`)
+                          }
+                        >
+                          View
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {isUsersWardrobe && (
+                    <TableRow>
+                      <TableCell colSpan={4}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          fullWidth
+                          onClick={() => location.assign(`/wardrobes/${data.wardrobeId}/addSection`)}
+                        >
+                          Create New Section
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            component="div"
+            count={sections.length}
+            rowsPerPage={10}
+            rowsPerPageOptions={[10]}
+            page={page}
+            onPageChange={handleChangePage}
+          />
+        </Paper>
+      </div>
+    </div>
   );
 }

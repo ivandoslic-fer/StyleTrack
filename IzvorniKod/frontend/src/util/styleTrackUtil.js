@@ -16,7 +16,11 @@ import CreateSectionPage from '../pages/CreateSectionPage';
 import SectionPage from '../pages/SectionPage';
 import CreateItemPage from '../pages/CreateItemPage';
 import UnauthorizedPage from '../pages/UnauthorizedPage';
+import ItemPage from '../pages/ItemPage';
+import ItemSearchPage from '../pages/ItemSearchPage';
+import AdvertiserLocationPage from '../pages/AdvertiserLocationsPage'
 
+const SHARING_ICON = "https://img.icons8.com/?size=100&id=tu1zRqb5NUud&format=png&color=000000";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -112,6 +116,14 @@ export const requestHandler = {
     putRequest: async (url, payload) => {
         try {
             const response = await axios.put(`${BACKEND_URL}${url}`, payload, { headers: getHeaders() });
+            return response;
+        } catch (error) {
+            handleAuthError(error, false);
+        }
+    },
+    deleteRequest: async (url) => {
+        try {
+            const response = await axios.delete(`${BACKEND_URL}${url}`, { headers: getHeaders() });
             return response;
         } catch (error) {
             handleAuthError(error, false);
@@ -228,6 +240,11 @@ async function loadProfile(username) {
     return response.data;
 }
 
+async function loadItem(wardrobeId, sectionId, itemId) {
+    const response = await requestHandler.getRequest(`/items/${itemId}`);
+    return response.data;
+}
+
 async function loadWardrobe(wardrobeId) {
     const response = await requestHandler.getRequest(`/wardrobes/${wardrobeId}`);
     return response.data;
@@ -272,6 +289,10 @@ export const router = createBrowserRouter([
         Component: ProfileSettingsPage
     },
     {
+        path: "/search/items",
+        Component: ItemSearchPage
+    },
+    {
         path: "/wardrobes",
         loader: authorizedLoader,
         Component: ClosetsPage,
@@ -305,6 +326,13 @@ export const router = createBrowserRouter([
         Component: CreateItemPage
     },
     {
+        path: "/wardrobes/:wardrobeId/:sectionId/item/:itemId",
+        loader: async ({ params }) => {
+            return loadItem(params.wardrobeId, params.sectionId, params.itemId);
+        },
+        Component: ItemPage
+    },
+    {
         path: "/oauth2/redirect",
         Component: OAuth2RedirectHandler
     },
@@ -315,8 +343,22 @@ export const router = createBrowserRouter([
     {
         path: "/unauthorized",
         Component: UnauthorizedPage
+    }, {
+        path: "/advertiser/locations",
+        Component: AdvertiserLocationPage
     }
 ]);
+
+export const getAddressFromCoordinates = async (latitude, longitude) => {
+    try {
+      const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+      const address = response.data.display_name;
+      return address;
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      return "Address not available";
+    }
+  };  
 
 export const getRandomColor = () => {
     // Define an array of background colors

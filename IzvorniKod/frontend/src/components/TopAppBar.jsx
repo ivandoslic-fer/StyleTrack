@@ -57,14 +57,14 @@ export default function ResponsiveAppBar() {
         {!isMobile && (
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', flex: 10}}>
             <Button color="inherit"><a href='/'>Home</a></Button>
-            { user && <Button color="inherit" onClick={() => location.assign(`/wardrobes?user=${user.username}`)}>My Wardrobes</Button> }
-            <Button color="inherit"><a href='/'>Search</a></Button>
+            { user && <Button id='my-wardrobes-button' color="inherit" onClick={() => location.assign(`/wardrobes?user=${user.username}`)}>My Wardrobes</Button> }
+            <Button color="inherit"><a href='/search/items'>Search</a></Button>
           </Box>
         )}
 
         {/* Login Button */}
         {
-          !styleTrackAuthProvider.isAuthenticated && <Button color="inherit" sx={{ marginLeft: 'auto' }}><a href='/login'>Login</a></Button> 
+          !styleTrackAuthProvider.isAuthenticated && <Button color="inherit" sx={{ marginLeft: 'auto' }}><a id='goto-login' href='/login'>Login</a></Button> 
         }
 
         {
@@ -77,7 +77,7 @@ export default function ResponsiveAppBar() {
                 <Avatar alt={user.username.toUpperCase()} sx={{ backgroundColor: getRandomColor() }} src={user.profilePictureUrl || "/"}/>
               </div>  
               }
-              <Button color="inherit" sx={{ marginLeft: '10px' }} onClick={handleLogout}>Logout</Button>
+              <Button id='logout-button' color="inherit" sx={{ marginLeft: '10px' }} onClick={handleLogout}>Logout</Button>
             </div>
           )
         }
@@ -106,7 +106,7 @@ export default function ResponsiveAppBar() {
         >
           <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign("/")}>Home</MenuItem>
           {user && <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign(`/wardrobes?user=${user.username}`)}>My Wardrobes</MenuItem>}
-          <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign("/")}>Search</MenuItem>
+          <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign("/search/items")}>Search</MenuItem>
           {styleTrackAuthProvider.isAuthenticated && <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign("/profile")}>Profile</MenuItem>}
           {styleTrackAuthProvider.isAuthenticated ? <MenuItem onClick={handleMenuClose} onMouseUp={() => styleTrackAuthProvider.logOut()}>Logout</MenuItem> : <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign("/login")}>Login</MenuItem>}
           

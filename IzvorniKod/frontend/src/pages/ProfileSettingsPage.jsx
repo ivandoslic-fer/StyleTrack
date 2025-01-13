@@ -13,6 +13,7 @@ export default function ProfileSettingsPage() {
   });
 
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,6 +24,7 @@ export default function ProfileSettingsPage() {
     const file = e.target.files[0];
     if (file) {
       setUploadedFile(file);
+      setPreviewUrl(URL.createObjectURL(file))
     }
   };
 
@@ -62,7 +64,6 @@ export default function ProfileSettingsPage() {
   return (
     <div className="bg-gray-100 py-6 px-4 md:flex md:justify-center md:items-center md:h-screen">
       <div className="md:bg-white p-6 rounded-lg md:shadow-lg w-full md:max-w-md md:flex-grow">
-        <a>{ JSON.stringify(user) }</a>
         <Typography variant="h5" className="text-center mb-4">
           Profile Settings
         </Typography>
@@ -70,7 +71,7 @@ export default function ProfileSettingsPage() {
           <div className="flex justify-center">
             <Avatar
               alt={formData.username.toUpperCase()}
-              src={user.profilePictureUrl || "/"}
+              src={previewUrl ? previewUrl : (user.profilePictureUrl || "/")}
               sx={{
                 width: 80,
                 height: 80,

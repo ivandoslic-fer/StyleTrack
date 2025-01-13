@@ -39,12 +39,13 @@ export default function LoginPage() {
         }}
       >
         {/* Page Title */}
-        <Typography variant="h5" component="h1" gutterBottom align="center">
+        <Typography id='login-header' variant="h5" component="h1" gutterBottom align="center">
           Login
         </Typography>
 
         {/* Username and Password Fields */}
         <TextField
+          id='user-name'
           label="Username"
           variant="outlined"
           fullWidth
@@ -53,6 +54,7 @@ export default function LoginPage() {
           onChange={e => setUsername(e.target.value)}
         />
         <TextField
+          id="password"
           label="Password"
           type="password"
           variant="outlined"
@@ -64,6 +66,7 @@ export default function LoginPage() {
 
         {/* Login Button */}
         <Button
+          id='login-button'
           variant="contained"
           color="primary"
           fullWidth
@@ -107,7 +110,7 @@ export default function LoginPage() {
           startIcon={<HowToReg />}
           fullWidth
         >
-          <a href='/register'>Let&apos;s sign you up!</a>
+          <a id='goto-register' href='/register'>Let&apos;s sign you up!</a>
         </Button>
       </Box>
     </Container>
