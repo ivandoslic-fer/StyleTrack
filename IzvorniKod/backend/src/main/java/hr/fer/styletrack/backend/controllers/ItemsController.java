@@ -126,6 +126,7 @@ public class ItemsController {
                     item.isForSharing(),
                     item.getMainImageUrl(),
                     owner.getDisplayName(),
+                    owner.getUsername(),
                     owner.getProfilePicture(),
                     owner.isAdvertiser()
             );
@@ -136,7 +137,6 @@ public class ItemsController {
 
 
     @PostMapping("/new")
-    @RolesAllowed(StyleTrackConstants.PERSONAL_USER_ROLE)
     public ResponseEntity<Item> createNewItem(@RequestBody ItemDto itemDto, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal) {
         try {
             Item createdItem = itemService.createItem(itemDto);
@@ -148,7 +148,6 @@ public class ItemsController {
     }
 
     @DeleteMapping("/delete/{itemId}")
-    @RolesAllowed(StyleTrackConstants.PERSONAL_USER_ROLE)
     public ResponseEntity<String> removeItemFromSection(@PathVariable Long itemId, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal) {
         Item item = itemRepository.findById(itemId).orElse(null);
         if (item == null) {

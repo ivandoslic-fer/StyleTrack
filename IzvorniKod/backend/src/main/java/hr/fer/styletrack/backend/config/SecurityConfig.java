@@ -49,7 +49,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/api/login", "/api/register", "/oauth2/**", "/api/users/**", "/api/advertisers/**", "/api/tags/**").permitAll();
+                    auth.requestMatchers("/api/login", "/api/register", "/oauth2/**", "/api/users/**", "/api/advertisers/**", "/api/tags/**", "/ws/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/wardrobes/**", "/api/sections/**", "/api/items/**").permitAll();
                     auth.anyRequest().authenticated();
                 })

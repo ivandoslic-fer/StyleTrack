@@ -19,6 +19,7 @@ import UnauthorizedPage from '../pages/UnauthorizedPage';
 import ItemPage from '../pages/ItemPage';
 import ItemSearchPage from '../pages/ItemSearchPage';
 import AdvertiserLocationPage from '../pages/AdvertiserLocationsPage'
+import NotificationsPage from '../pages/NotificationsPage';
 
 const SHARING_ICON = "https://img.icons8.com/?size=100&id=tu1zRqb5NUud&format=png&color=000000";
 
@@ -301,6 +302,11 @@ export const router = createBrowserRouter([
         path: "/wardrobes/create",
         loader: authorizedLoader,
         Component: CreateWardrobePage
+    },
+    {
+        path: "/notifications",
+        loader: authorizedLoader,
+        Component: NotificationsPage
     },
     {
         path: "/wardrobes/:wardrobeId",

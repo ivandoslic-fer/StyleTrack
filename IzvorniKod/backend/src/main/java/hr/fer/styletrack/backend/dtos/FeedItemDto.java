@@ -14,11 +14,12 @@ public class FeedItemDto {
     private boolean forSharing;
     private String mainImageUrl;
     private String ownerDisplayName;
+    private String ownerUsername;
     private String ownerProfilePicture;
     private boolean isAdvertiser;
 
     public FeedItemDto(Long itemId, String itemName, String description, String brand, String seasonCategory,
-                       boolean forSharing, String mainImageUrl, String ownerDisplayName,
+                       boolean forSharing, String mainImageUrl, String ownerDisplayName, String ownerUsername,
                        String ownerProfilePicture, boolean isAdvertiser) {
         this.itemId = itemId;
         this.itemName = itemName;
@@ -28,6 +29,7 @@ public class FeedItemDto {
         this.forSharing = forSharing;
         this.mainImageUrl = mainImageUrl;
         this.ownerDisplayName = ownerDisplayName;
+        this.ownerUsername = ownerUsername;
         this.ownerProfilePicture = ownerProfilePicture;
         this.isAdvertiser = isAdvertiser;
     }

@@ -40,7 +40,6 @@ public class WardrobesController {
         System.out.println(forSharing);
 
         if (forSharing != null && forSharing && username.isEmpty()) {
-            System.out.println("RETURN 1");
             return ResponseEntity.ok(wardrobeRepository.getWardrobesByIsPublicIsTrue().stream()
                     .map(wardrobe -> new WardrobeDto(
                             wardrobe.getUser().getId(),
@@ -57,11 +56,9 @@ public class WardrobesController {
             Optional<User> user = userRepository.findByUsername(username);
 
             if (user.isEmpty()) {
-                System.out.println("RETURN 2");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
 
-            System.out.println("RETURN 3");
             return ResponseEntity.ok(user.get().getWardrobes().stream()
                     .filter(Wardrobe::isPublic)
                     .map(WardrobeDto::new).collect(Collectors.toList()));
@@ -72,11 +69,9 @@ public class WardrobesController {
             Optional<User> user = userRepository.findByUsername(username);
 
             if (user.isEmpty()) {
-                System.out.println("RETURN 4");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
 
-            System.out.println("RETURN 5");
             for (Wardrobe wardrobe : user.get().getWardrobes()) {
                 System.out.println(wardrobe.getWardrobeName());
             }
@@ -84,7 +79,6 @@ public class WardrobesController {
                     .map(WardrobeDto::new).collect(Collectors.toList()));
         }
 
-        System.out.println("RETURN 6");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
@@ -104,7 +98,6 @@ public class WardrobesController {
     }
 
     @PostMapping("/new")
-    @RolesAllowed(StyleTrackConstants.PERSONAL_USER_ROLE)
     @PreAuthorize("#usersWardrobeDto.ownerId == principal.user.id")
     public ResponseEntity<WardrobeDto> addNewWardrobe(@RequestBody WardrobeDto usersWardrobeDto, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal){
         if (authenticatedPrincipal == null) {
@@ -133,7 +126,6 @@ public class WardrobesController {
     }
 
     @DeleteMapping("/delete/{wardrobeId}")
-    @RolesAllowed(StyleTrackConstants.PERSONAL_USER_ROLE)
     public ResponseEntity<String> deleteWardrobe(@PathVariable Long wardrobeId, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal){
 
         if(!wardrobeRepository.findByWardrobeId(wardrobeId).get().getUser().getUsername().equals(authenticatedPrincipal.getUsername())){
@@ -148,7 +140,6 @@ public class WardrobesController {
     }
 
     @PutMapping("/{wardrobeId}")
-    @RolesAllowed(StyleTrackConstants.PERSONAL_USER_ROLE)
     public ResponseEntity<WardrobeDetailedDto> updateWardrobe(@PathVariable Long wardrobeId, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal, @RequestBody WardrobeDto requestWardrobeDto) {
         Optional<Wardrobe> wardrobeOptional = wardrobeRepository.findByWardrobeId(wardrobeId);
         if (!wardrobeOptional.isPresent()) {
