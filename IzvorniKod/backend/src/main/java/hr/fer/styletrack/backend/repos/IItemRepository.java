@@ -14,4 +14,5 @@ public interface IItemRepository extends JpaRepository<Item, Long>, JpaSpecifica
 
     @Query("SELECT i FROM Item i WHERE i.section.wardrobe.isPublic = true")
     List<Item> findItemsInPublicWardrobes();
+    List<Item> findAllBySection_Wardrobe_User_Username(String username);
 }

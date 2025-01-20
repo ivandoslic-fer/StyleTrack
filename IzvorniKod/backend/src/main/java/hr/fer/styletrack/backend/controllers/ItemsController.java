@@ -55,6 +55,20 @@ public class ItemsController {
         }
     }
 
+    @GetMapping("/my-items")
+    public ResponseEntity<List<ItemDto>> getCurrentUserItems(@AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal) {
+        try {
+            // Find all items owned by the authenticated user
+            List<Item> userItems = itemRepository.findAllBySection_Wardrobe_User_Username(authenticatedPrincipal.getUsername());
+            List<ItemDto> userItemsDto = userItems.stream().map(ItemDto::new).toList();
+
+            return ResponseEntity.ok(userItemsDto);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @GetMapping("/{itemId}")
     public ResponseEntity<ItemDto> getItemById(@PathVariable Long itemId, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal){
         try {

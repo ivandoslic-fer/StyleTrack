@@ -22,7 +22,7 @@ export default function ResponsiveAppBar() {
   const [unreadNotificationIds, setUnreadNotificationIds] = useState(new Set()); // To track unique unread notification IDs
 
   const connectWebSocket = (user) => {
-    const socket = new SockJS("http://localhost:8080/ws");
+    const socket = new SockJS("https://styletrack-backend-stage.onrender.com/ws");
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
@@ -120,6 +120,7 @@ export default function ResponsiveAppBar() {
             <Button color="inherit"><a href='/'>Home</a></Button>
             { user && <Button id='my-wardrobes-button' color="inherit" onClick={() => location.assign(`/wardrobes?user=${user.username}`)}>My Wardrobes</Button> }
             <Button color="inherit"><a href='/search/items'>Search</a></Button>
+            { user && <Button id='my-outfits-button' color="inherit" onClick={() => location.assign(`/outfits?user=${user.username}`)}>My Outfits</Button> }
           </Box>
         )}
 
@@ -139,7 +140,7 @@ export default function ResponsiveAppBar() {
 
         {
           styleTrackAuthProvider.isAuthenticated && !isMobile && (
-            <div className='flex flex-row flex-1'>
+            <div className='flex flex-row flex-1 ml-3'>
               {
               user &&
               user.username && 
@@ -177,6 +178,7 @@ export default function ResponsiveAppBar() {
           <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign("/")}>Home</MenuItem>
           {user && <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign(`/wardrobes?user=${user.username}`)}>My Wardrobes</MenuItem>}
           <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign("/search/items")}>Search</MenuItem>
+          {user && <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign(`/outfits?user=${user.username}`)}>My Outfits</MenuItem>}
           {styleTrackAuthProvider.isAuthenticated && <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign("/profile")}>Profile</MenuItem>}
           {styleTrackAuthProvider.isAuthenticated ? <MenuItem onClick={handleMenuClose} onMouseUp={() => styleTrackAuthProvider.logOut()}>Logout</MenuItem> : <MenuItem onClick={handleMenuClose} onMouseUp={() => location.assign("/login")}>Login</MenuItem>}
           

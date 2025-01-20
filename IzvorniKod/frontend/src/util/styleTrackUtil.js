@@ -20,6 +20,9 @@ import ItemPage from '../pages/ItemPage';
 import ItemSearchPage from '../pages/ItemSearchPage';
 import AdvertiserLocationPage from '../pages/AdvertiserLocationsPage'
 import NotificationsPage from '../pages/NotificationsPage';
+import CreateOutfitPage from '../pages/CreateOutfitPage';
+import OutfitsPage from '../pages/OutfitsPage';
+import OutfitPage from '../pages/OutfitPage';
 
 const SHARING_ICON = "https://img.icons8.com/?size=100&id=tu1zRqb5NUud&format=png&color=000000";
 
@@ -180,6 +183,19 @@ const handleAuthError = (error, gettingUser) => {
     }
 };
 
+async function loadItemById(itemId) {
+    try {
+        const response = await requestHandler.getRequest(`/items/${itemId}`);
+        const sectionId = response.data.sectionId;
+        const response2 = await requestHandler.getRequest(`/sections/${sectionId}`);
+        const wardrobeId = response2.data.wardrobeId;
+        return {sectionId, wardrobeId};
+    } catch (error) {
+        console.error("Failed to load item:", error);
+        throw new Error("Item not found");
+    }
+}
+
 async function loginLoader() {
     if (styleTrackAuthProvider.isAuthenticated) {
       return redirect("/");
@@ -251,6 +267,11 @@ async function loadWardrobe(wardrobeId) {
     return response.data;
 }
 
+async function loadOutfit(outfitId) {
+    const response = await requestHandler.getRequest(`/outfits/${outfitId}`);
+    return response.data;
+}
+
 async function loadSection(sectionId) {
     const response = await requestHandler.getRequest(`/sections/${sectionId}`);
     return response.data;
@@ -309,12 +330,36 @@ export const router = createBrowserRouter([
         Component: NotificationsPage
     },
     {
+        path: "/items/:itemId",
+        loader: async ({ params }) => {
+            const {sectionId, wardrobeId} = await loadItemById(params.itemId);
+            return redirect(`/wardrobes/${wardrobeId}/${sectionId}/item/${params.itemId}`);
+        },
+    },
+    {
         path: "/wardrobes/:wardrobeId",
         loader: async ({ params }) => {
             // We'll need to handle the public logic here
             return loadWardrobe(params.wardrobeId);
         },
         Component: ClosetPage,
+    },
+    {
+        path: "/outfits",
+        loader: authorizedLoader,
+        Component: OutfitsPage
+    },
+    {
+        path: "/outfits/:outfitId",
+        loader: async ({ params }) => {
+            return loadOutfit(params.outfitId);
+        },
+        Component: OutfitPage
+    },
+    {
+        path: "/outfits/create",
+        loader: authorizedLoader,
+        Component: CreateOutfitPage
     },
     {
         path: "/wardrobes/:wardrobeId/addSection",

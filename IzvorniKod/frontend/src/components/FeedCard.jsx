@@ -1,7 +1,8 @@
 import { MailOutline, ShoppingBagOutlined, VolunteerActivism } from "@mui/icons-material";
-import { Card, CardContent, CardMedia, Typography, Avatar, Box, Tooltip, IconButton, TextField, DialogActions, Button, DialogContent, DialogTitle, Dialog } from "@mui/material";
+import { Card, CardContent, CardMedia, Typography, Avatar, Box, Tooltip, IconButton, TextField, DialogActions, Button, DialogContent, DialogTitle, Dialog, duration } from "@mui/material";
 import { useEffect, useState } from "react";
 import { requestHandler, styleTrackAuthProvider } from "../util/styleTrackUtil";
+import { useSnackbar } from "../context/SnackbarContext";
 
 const FeedCard = ({ item }) => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -9,6 +10,7 @@ const FeedCard = ({ item }) => {
   const [contactInfo, setContactInfo] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const { showSnackbar } = useSnackbar();
 
   const handleDialogOpen = () => {
     setOpenDialog(true);
@@ -22,7 +24,11 @@ const FeedCard = ({ item }) => {
 
   const handleSendNotification = async () => {
     if (!contactInfo || !message) {
-      alert("Both Contact Information and Message are required.");
+      showSnackbar({
+        severity: "error",
+        message: "Both Contact Information and Message are required.",
+        duration: 3000
+      })
       return;
     }
 
@@ -36,11 +42,19 @@ const FeedCard = ({ item }) => {
         message: message,
       });
 
-      alert("Notification sent successfully!");
+      showSnackbar({
+        severity: "success",
+        message: "Notification sent successfully!",
+        duration: 3000
+      });
       handleDialogClose();
     } catch (error) {
       console.error("Failed to send notification:", error);
-      alert("Failed to send notification. Please try again later.");
+      showSnackbar({
+        severity: "error",
+        message: "Failed to send notification. Please try again later.",
+        duration: 3000
+      })
     } finally {
       setIsLoading(false);
     }
@@ -68,7 +82,7 @@ const FeedCard = ({ item }) => {
       <CardContent>
       <Box sx={{ display: "flex", alignItems: "center" }}>
           <Typography variant="h6" sx={{ display: "flex", alignItems: "center" }}>
-            {item.itemName}
+            <a href={`/items/${item.itemId}`}>{item.itemName}</a>
             {item.forSharing && (
               <Tooltip title="For Sharing" placement="top" arrow>
                 <VolunteerActivism className="text-green-500" sx={{ ml: 1 }} />
