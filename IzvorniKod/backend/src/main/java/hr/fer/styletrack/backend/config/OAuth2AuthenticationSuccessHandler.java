@@ -137,7 +137,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Couldn't find your account or provider");
         }
 
-        String redirectUrl = "https://styletrack-frontend-stage.onrender.com/oauth2/redirect?token=" + jwtToken.get() + "&username=" + username.get();
+        String redirectUrl = "http://localhost:5173/oauth2/redirect?token=" + jwtToken.get() + "&username=" + username.get();
         response.sendRedirect(redirectUrl);
     }
 

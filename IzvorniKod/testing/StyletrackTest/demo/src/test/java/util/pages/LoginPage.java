@@ -36,4 +36,8 @@ public class LoginPage extends BasePage {
         click(gotoRegister);
         return new RegisterPage();
     }
+
+    public String getSnackbarText() {
+        return find(snackBar).getText();
+    }
 }

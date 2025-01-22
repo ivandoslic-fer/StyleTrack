@@ -2,6 +2,8 @@ import { Container, Box, TextField, Button, Typography, Divider } from '@mui/mat
 import { Google, GitHub, Login } from '@mui/icons-material';
 import { useState } from 'react';
 import { styleTrackAuthProvider } from '../util/styleTrackUtil';
+import { useSnackbar } from '../context/SnackbarContext';
+
 
 export default function RegisterPage() {
   const [userType, setUserType] = useState("personal");
@@ -12,8 +14,75 @@ export default function RegisterPage() {
   const [displayName, setDislpayName] = useState("");
   const [companyAddress, setCompanyAddress] = useState("");
   const [companyWebsite, setCompanyWebsite] = useState("");
+  const { showSnackbar } = useSnackbar();
 
   const handleSignUp = async () => {
+    // Validation for empty fields
+    if (!email.trim()) {
+      showSnackbar({
+        severity: "error",
+        message: "Email cannot be empty",
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (!username.trim()) {
+      showSnackbar({
+        severity: "error",
+        message: "Username cannot be empty",
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (!password.trim()) {
+      showSnackbar({
+        severity: "error",
+        message: "Password cannot be empty",
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (password !== confPassword) {
+      showSnackbar({
+        severity: "error",
+        message: "Passwords do not match",
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (!displayName.trim()) {
+      showSnackbar({
+        severity: "error",
+        message: `Display Name cannot be empty`,
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (userType === "advertiser") {
+      if (!companyAddress.trim()) {
+        showSnackbar({
+          severity: "error",
+          message: "Company Address cannot be empty",
+          duration: 3000,
+        });
+        return;
+      }
+
+      if (!companyWebsite.trim()) {
+        showSnackbar({
+          severity: "error",
+          message: "Company Website cannot be empty",
+          duration: 3000,
+        });
+        return;
+      }
+    }
+
     try {
       let success = null;
       if (userType === 'advertiser') {
@@ -25,6 +94,11 @@ export default function RegisterPage() {
       if (success) location.replace("/login");
     } catch (error) {
       console.error("Registration failed:", error);
+      showSnackbar({
+        severity: "error",
+        message: "Registration failed. Please try again.",
+        duration: 3000,
+      });
     }
   };
 

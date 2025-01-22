@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "HTTPS://testng.org/testng-1.0.dtd">
+<suite name="Styletrack-Test-Suite">
+    <test name="StyletrackTests">
+        <classes>
+            <class name="hr.fer.styletrack.demo.auth.SignupTest" />
+            <class name="hr.fer.styletrack.demo.auth.BadSignupTest" />
+            <class name="hr.fer.styletrack.demo.auth.LoginTest" />
+            <class name="hr.fer.styletrack.demo.auth.BadLoginTest" />
+            <class name="hr.fer.styletrack.demo.auth.LogoutTest" />
+            <class name="hr.fer.styletrack.demo.wardrobes.CreateWardrobeTest" />
+        </classes>
+    </test>
+</suite>

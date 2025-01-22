@@ -2,21 +2,47 @@ import { Container, Box, TextField, Button, Typography, Divider } from '@mui/mat
 import { Google, GitHub, HowToReg } from '@mui/icons-material';
 import { useState } from 'react';
 import { styleTrackAuthProvider } from '../util/styleTrackUtil';
+import { useSnackbar } from '../context/SnackbarContext';
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { showSnackbar } = useSnackbar();
 
   const handleLogin = async () => {
+    // Validation for empty fields
+    if (!username.trim()) {
+      showSnackbar({
+        severity: "error",
+        message: "Username cannot be empty",
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (!password.trim()) {
+      showSnackbar({
+        severity: "error",
+        message: "Password cannot be empty",
+        duration: 3000,
+      });
+      return;
+    }
+
     try {
       const success = await styleTrackAuthProvider.signIn(username, password);
       if (success) {
-          location.replace("/"); // Redirect to home on successful login
+        location.replace("/"); // Redirect to home on successful login
       }
-  } catch (error) {
+    } catch (error) {
       console.error("Login failed:", error);
-  }
-  }
+      showSnackbar({
+        severity: "error",
+        message: "Login failed. Please check your credentials.",
+        duration: 3000,
+      });
+    }
+  };
 
   return (
     <Container

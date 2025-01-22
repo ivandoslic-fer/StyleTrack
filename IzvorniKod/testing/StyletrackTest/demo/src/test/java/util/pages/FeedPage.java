@@ -11,6 +11,7 @@ public class FeedPage extends BasePage {
     public boolean isMyWardrobesButtonPresent() {
         return find(myWardrobesButton).isDisplayed();
     }
+    public boolean isLoginButtonPresent() { return find(gotoLogin).isDisplayed(); }
 
     public LoginPage openLoginPage() {
         driver.findElement(gotoLogin).click();
@@ -20,5 +21,10 @@ public class FeedPage extends BasePage {
     public FeedPage pressLogoutButton() {
         driver.findElement(logoutButton).click();
         return new FeedPage();
+    }
+
+    public MyWardrobesPage pressMyWardrobesButton() {
+        driver.findElement(myWardrobesButton).click();
+        return new MyWardrobesPage();
     }
 }

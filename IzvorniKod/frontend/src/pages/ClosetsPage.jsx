@@ -155,6 +155,7 @@ export default function ClosetsPage() {
                             Create a New Wardrobe
                         </Typography>
                         <Button
+                            id='create-wardrobe-button'
                             variant="contained"
                             sx={{
                                 borderRadius: '45px',

@@ -29,6 +29,7 @@ export const SnackbarProvider = ({ children }) => {
     <SnackbarContext.Provider value={{ showSnackbar, closeSnackbar }}>
       {children}
       <Snackbar
+        id="bottom-snackbar"
         open={snackbar.open}
         autoHideDuration={snackbar.duration}
         onClose={closeSnackbar}

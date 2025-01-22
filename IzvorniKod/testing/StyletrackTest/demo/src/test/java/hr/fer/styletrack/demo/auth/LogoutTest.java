@@ -14,7 +14,7 @@ public class LogoutTest extends BaseTest {
         try {
             LoginPage loginPage = feedPage.openLoginPage();
 
-            loginPage.setUsername("seleniumTest");
+            loginPage.setUsername("seleniumTestAgent");
             loginPage.setPassword("seleniumTestPassw0rd");
 
             FeedPage feedPageAfterLogin = loginPage.clickLoginButton();
@@ -25,7 +25,7 @@ public class LogoutTest extends BaseTest {
 
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 
-            Assert.assertFalse(feedPageAfterLogout.isMyWardrobesButtonPresent());
+            Assert.assertTrue(feedPageAfterLogout.isLoginButtonPresent());
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }

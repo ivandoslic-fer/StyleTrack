@@ -74,6 +74,7 @@ export default function CreateWardrobePage() {
             <div className="flex flex-col h-full w-full md:w-1/3 m-4">
               <TextField
                 fullWidth
+                id="wardrobe-name-field"
                 label="Wardrobe name"
                 name="wardobeName"
                 variant="outlined"
@@ -82,6 +83,7 @@ export default function CreateWardrobePage() {
                 className="w-full"
               />
               <TextField
+                id="wardrobe-description-field"
                 fillWidth
                 multiline
                 name="wardrobeDescription"
@@ -168,6 +170,7 @@ export default function CreateWardrobePage() {
             className="mt-4"
           >
             <Button
+              id="save-button"
               variant="contained"
               color="primary"
               type="submit"

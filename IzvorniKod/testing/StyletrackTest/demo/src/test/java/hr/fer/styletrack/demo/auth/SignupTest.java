@@ -15,11 +15,11 @@ public class SignupTest extends BaseTest {
         try {
             RegisterPage registerPage = feedPage.openLoginPage().openRegisterPage();
 
-            registerPage.enterEmail("seleniumTestAgent@styletrack.com");
-            registerPage.enterUsername("seleniumTestAgent");
+            registerPage.enterEmail("seleniumTestAgent2@styletrack.com");
+            registerPage.enterUsername("seleniumTestAgent2");
             registerPage.enterPassword("seleniumTestPassw0rd");
             registerPage.enterPasswordConfirm("seleniumTestPassw0rd");
-            registerPage.enterDisplayName("Selenium Test");
+            registerPage.enterDisplayName("Selenium Test 2");
 
             LoginPage loginPageAfterRegistration = registerPage.pressSignupButton();
 

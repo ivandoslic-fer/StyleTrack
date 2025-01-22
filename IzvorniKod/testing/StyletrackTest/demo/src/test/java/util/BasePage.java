@@ -7,6 +7,8 @@ import org.openqa.selenium.WebElement;
 public class BasePage {
     public static WebDriver driver;
 
+    public By snackBar = By.id("bottom-snackbar");
+
     public void setDriver(WebDriver driver) {
         BasePage.driver = driver;
     }
