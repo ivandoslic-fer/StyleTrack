@@ -2,6 +2,8 @@ import { Container, Box, TextField, Button, Typography, Divider } from '@mui/mat
 import { Google, GitHub, Login } from '@mui/icons-material';
 import { useState } from 'react';
 import { styleTrackAuthProvider } from '../util/styleTrackUtil';
+import { useSnackbar } from '../context/SnackbarContext';
+
 
 export default function RegisterPage() {
   const [userType, setUserType] = useState("personal");
@@ -12,8 +14,75 @@ export default function RegisterPage() {
   const [displayName, setDislpayName] = useState("");
   const [companyAddress, setCompanyAddress] = useState("");
   const [companyWebsite, setCompanyWebsite] = useState("");
+  const { showSnackbar } = useSnackbar();
 
   const handleSignUp = async () => {
+    // Validation for empty fields
+    if (!email.trim()) {
+      showSnackbar({
+        severity: "error",
+        message: "Email cannot be empty",
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (!username.trim()) {
+      showSnackbar({
+        severity: "error",
+        message: "Username cannot be empty",
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (!password.trim()) {
+      showSnackbar({
+        severity: "error",
+        message: "Password cannot be empty",
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (password !== confPassword) {
+      showSnackbar({
+        severity: "error",
+        message: "Passwords do not match",
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (!displayName.trim()) {
+      showSnackbar({
+        severity: "error",
+        message: `Display Name cannot be empty`,
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (userType === "advertiser") {
+      if (!companyAddress.trim()) {
+        showSnackbar({
+          severity: "error",
+          message: "Company Address cannot be empty",
+          duration: 3000,
+        });
+        return;
+      }
+
+      if (!companyWebsite.trim()) {
+        showSnackbar({
+          severity: "error",
+          message: "Company Website cannot be empty",
+          duration: 3000,
+        });
+        return;
+      }
+    }
+
     try {
       let success = null;
       if (userType === 'advertiser') {
@@ -25,6 +94,11 @@ export default function RegisterPage() {
       if (success) location.replace("/login");
     } catch (error) {
       console.error("Registration failed:", error);
+      showSnackbar({
+        severity: "error",
+        message: "Registration failed. Please try again.",
+        duration: 3000,
+      });
     }
   };
 
@@ -85,6 +159,7 @@ export default function RegisterPage() {
           label="Email"
           variant="outlined"
           type='email'
+          id='email-field'
           fullWidth
           margin="normal"
           value={email}
@@ -93,6 +168,7 @@ export default function RegisterPage() {
         <TextField
           label="Username"
           variant="outlined"
+          id='username-field'
           fullWidth
           margin="normal"
           value={username}
@@ -102,6 +178,7 @@ export default function RegisterPage() {
           label="Password"
           type="password"
           variant="outlined"
+          id='password-field'
           fullWidth
           margin="normal"
           value={password}
@@ -111,6 +188,7 @@ export default function RegisterPage() {
           label="Confirm password"
           type="password"
           variant="outlined"
+          id='conf-password-field'
           fullWidth
           margin="normal"
           value={confPassword}
@@ -121,6 +199,7 @@ export default function RegisterPage() {
           label={userType === 'advertiser' ? "Company Name" : "Display Name"}
           variant="outlined"
           fullWidth
+          id='display-name-field'
           margin="normal"
           value={displayName}
           onChange={e => setDislpayName(e.target.value)}
@@ -152,6 +231,7 @@ export default function RegisterPage() {
         <Button
           variant="contained"
           color="primary"
+          id='signup-button'
           fullWidth
           sx={{ marginTop: 2, marginBottom: 2 }}
           onClick={handleSignUp}

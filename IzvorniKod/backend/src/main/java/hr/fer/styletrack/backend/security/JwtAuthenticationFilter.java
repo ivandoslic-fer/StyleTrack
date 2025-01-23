@@ -3,6 +3,7 @@ package hr.fer.styletrack.backend.security;
 import hr.fer.styletrack.backend.misc.StyleTrackUserDetails;
 import hr.fer.styletrack.backend.services.StyleTrackUserDetailsService;
 import hr.fer.styletrack.backend.utils.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +38,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwtToken = authorizationHeader.split("Bearer ")[1].trim();
-            username = jwtUtil.extractUsername(jwtToken);
+
+            try {
+                username = jwtUtil.extractUsername(jwtToken);
+            } catch (ExpiredJwtException e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Set 401 status
+                response.getWriter().write("JWT token has expired");
+                response.getWriter().flush();
+                return; // Stop further processing
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("JWT token could not be parsed");
+                response.getWriter().flush();
+                return;
+            }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -49,8 +63,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Invalid JWT token");
+                response.getWriter().flush();
+                return;
             }
         }
-        filterChain.doFilter(request, response);
+        try {
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
     }
 }

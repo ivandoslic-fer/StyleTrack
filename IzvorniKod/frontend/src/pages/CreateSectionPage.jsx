@@ -1,16 +1,35 @@
-import { Button, Stack, TextField, Typography } from "@mui/material";
+import { Button, Stack, TextField, Typography, MenuItem, duration } from "@mui/material";
 import { useState } from "react";
 import { requestHandler } from "../util/styleTrackUtil";
 import { useParams } from "react-router-dom";
+import { useSnackbar } from "../context/SnackbarContext";
 
 export default function CreateSectionPage() {
   const { wardrobeId } = useParams();
+
+  const { showSnackbar } = useSnackbar();
 
   const [formData, setFormData] = useState({
     sectionName: "",
     sectionType: "",
     itemCapacity: "",
   });
+
+  const showSuccessSnackbar = () => {
+    showSnackbar({
+      message: "Section created successfully!",
+      severity: "success",
+      duration: 3000
+    })
+  }
+
+  const showSnackbarError = (message) => {
+    showSnackbar({
+      message,
+      severity: 'error',
+      duration: 3000
+    })
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,17 +39,36 @@ export default function CreateSectionPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newSection = {
-      wardrobeId: parseInt(wardrobeId, 10),
-      sectionName: formData.sectionName,
-      sectionType: formData.sectionType,
-      sectionCapacity: parseInt(formData.itemCapacity, 10),
-    };
+    try {
+      const newSection = {
+        wardrobeId: parseInt(wardrobeId, 10),
+        sectionName: formData.sectionName,
+        sectionType: formData.sectionType,
+        sectionCapacity: parseInt(formData.itemCapacity, 10),
+      };
+  
+      await requestHandler.postRequest(`/sections/new`, newSection);
+    } catch (e) {
+      showSnackbarError(e.message)
+    }
 
-    await requestHandler.postRequest(`/sections/new`, newSection);
+    showSuccessSnackbar();
 
     location.replace(`/wardrobes/${wardrobeId}`);
   };
+
+  const sectionTypes = [
+    "Shelf",
+    "Drawer",
+    "Rack",
+    "Compartment",
+    "Hanger Area",
+    "Cabinet",
+    "Bin",
+    "Container",
+    "Storage Area",
+    "Custom",
+  ];
 
   return (
     <div className="bg-gray-100 py-6 px-4 md:flex md:justify-center md:items-center md:h-screen">
@@ -56,8 +94,15 @@ export default function CreateSectionPage() {
             value={formData.sectionType}
             onChange={handleChange}
             required
-            helperText="E.g., Shelf, Drawer, Clothing Rail"
-          />
+            select
+            helperText="Select the type of wardrobe section"
+          >
+            {sectionTypes.map((type, index) => (
+              <MenuItem key={index} value={type}>
+                {type}
+              </MenuItem>
+            ))}
+          </TextField>
           <TextField
             fullWidth
             label="Item Capacity"

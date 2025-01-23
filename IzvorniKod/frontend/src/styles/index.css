@@ -5,4 +5,19 @@
 body {
     font-family: 'Inter', sans-serif;
 }
-  
+
+.minimap-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(39, 39, 39, 0.9); /* Semi-transparent background */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 10; /* Ensure overlay is on top of the map */
+}

@@ -63,10 +63,7 @@ public class SectionsController {
     }
 
     @PostMapping("/new")
-    @RolesAllowed(StyleTrackConstants.PERSONAL_USER_ROLE)
     public ResponseEntity<SectionDto> addNewSection(@RequestBody SectionDto usersSectionDto, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal) {
-        System.out.println(usersSectionDto);
-
         if(!wardrobeRepository.findByWardrobeId(usersSectionDto.getWardrobeId()).get().getUser().getUsername().equals(authenticatedPrincipal.user.getUsername())){
             return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
         }
@@ -93,7 +90,6 @@ public class SectionsController {
     }
 
     @DeleteMapping("/delete/{sectionId}")
-    @RolesAllowed(StyleTrackConstants.PERSONAL_USER_ROLE)
     public ResponseEntity<String> deleteSection(@PathVariable Long sectionId, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal) {
         Wardrobe wardrobe = sectionRepository.findBySectionId(sectionId).get().getWardrobe();
         if(!(wardrobe.getUser().getUsername().equals(authenticatedPrincipal.user.getUsername()))){

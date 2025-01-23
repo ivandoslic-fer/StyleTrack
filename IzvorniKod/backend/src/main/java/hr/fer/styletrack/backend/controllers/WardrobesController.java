@@ -10,6 +10,7 @@ import hr.fer.styletrack.backend.repos.IWardrobeRepository;
 import hr.fer.styletrack.backend.utils.StyleTrackConstants;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -37,13 +39,16 @@ public class WardrobesController {
         System.out.println(username);
         System.out.println(forSharing);
 
-        if (forSharing != null && forSharing && (username.isEmpty())) {
+        if (forSharing != null && forSharing && username.isEmpty()) {
             return ResponseEntity.ok(wardrobeRepository.getWardrobesByIsPublicIsTrue().stream()
                     .map(wardrobe -> new WardrobeDto(
                             wardrobe.getUser().getId(),
                             wardrobe.getWardrobeId(),
                             wardrobe.getWardrobeName(),
-                            new ArrayList<>()
+                            wardrobe.getDescription(),
+                            wardrobe.isPublic(),
+                            wardrobe.getLongitude(),
+                            wardrobe.getLatitude()
                     )).collect(Collectors.toList()));
         } // You need to look if there are no wardrobes and return NOT_FOUND in that case
 
@@ -59,7 +64,7 @@ public class WardrobesController {
                     .map(WardrobeDto::new).collect(Collectors.toList()));
         }
 
-        if ((forSharing == null || !forSharing) && username.equals(authenticatedPrincipal.user.getUsername())) {
+        if ((forSharing == null || !forSharing) && username.equals(authenticatedPrincipal.getUsername())) {
 
             Optional<User> user = userRepository.findByUsername(username);
 
@@ -67,6 +72,9 @@ public class WardrobesController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
 
+            for (Wardrobe wardrobe : user.get().getWardrobes()) {
+                System.out.println(wardrobe.getWardrobeName());
+            }
             return ResponseEntity.ok(user.get().getWardrobes().stream()
                     .map(WardrobeDto::new).collect(Collectors.toList()));
         }
@@ -76,6 +84,7 @@ public class WardrobesController {
 
     @GetMapping("/{wardrobeId}")
     public ResponseEntity<WardrobeDetailedDto> getWardrobeById(@PathVariable Long wardrobeId, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal) {
+        System.out.println("GOT INTO WARDROBE GET");
         Wardrobe wardrobe = wardrobeRepository.findById(wardrobeId).orElse(null);
 
         if (wardrobe == null) {
@@ -90,7 +99,6 @@ public class WardrobesController {
     }
 
     @PostMapping("/new")
-    @RolesAllowed(StyleTrackConstants.PERSONAL_USER_ROLE)
     @PreAuthorize("#usersWardrobeDto.ownerId == principal.user.id")
     public ResponseEntity<WardrobeDto> addNewWardrobe(@RequestBody WardrobeDto usersWardrobeDto, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal){
         if (authenticatedPrincipal == null) {
@@ -101,13 +109,13 @@ public class WardrobesController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        System.out.println(usersWardrobeDto);
-
         try {
             Wardrobe newWardrobe = new Wardrobe();
             newWardrobe.setWardrobeName(usersWardrobeDto.getWardrobeName());
             newWardrobe.setPublic(false);
-            // newWardrobe.setTags(usersWardrobeDto.getTags());
+            if (usersWardrobeDto.getLongitude() != null) newWardrobe.setLongitude(usersWardrobeDto.getLongitude());
+            if (usersWardrobeDto.getLongitude() != null) newWardrobe.setLatitude(usersWardrobeDto.getLatitude());
+            newWardrobe.setDescription(usersWardrobeDto.getDescription());
             newWardrobe.setUser(userRepository.findByUsername(authenticatedPrincipal.user.getUsername()).get());
 
             wardrobeRepository.save(newWardrobe);
@@ -119,7 +127,6 @@ public class WardrobesController {
     }
 
     @DeleteMapping("/delete/{wardrobeId}")
-    @RolesAllowed(StyleTrackConstants.PERSONAL_USER_ROLE)
     public ResponseEntity<String> deleteWardrobe(@PathVariable Long wardrobeId, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal){
 
         if(!wardrobeRepository.findByWardrobeId(wardrobeId).get().getUser().getUsername().equals(authenticatedPrincipal.getUsername())){
@@ -133,5 +140,34 @@ public class WardrobesController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("deleted wardrobe");
     }
 
-    // Potentially we'll need to add PUT method for updating tags when added but for now updating is not needed
+    @PutMapping("/{wardrobeId}")
+    public ResponseEntity<WardrobeDetailedDto> updateWardrobe(@PathVariable Long wardrobeId, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal, @RequestBody WardrobeDto requestWardrobeDto) {
+        Optional<Wardrobe> wardrobeOptional = wardrobeRepository.findByWardrobeId(wardrobeId);
+        if (!wardrobeOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Wardrobe wardrobe = wardrobeOptional.get();
+
+        if (!wardrobeId.equals(wardrobe.getWardrobeId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        // Check if the authenticated user is the owner of the wardrobe
+        if (!Objects.equals(wardrobe.getUser().getId(), authenticatedPrincipal.user.getId())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        wardrobe.setWardrobeName(requestWardrobeDto.getWardrobeName());
+        wardrobe.setLongitude(requestWardrobeDto.getLongitude());
+        wardrobe.setLatitude(requestWardrobeDto.getLatitude());
+        wardrobe.setDescription(requestWardrobeDto.getDescription());
+        wardrobe.setPublic(requestWardrobeDto.isPublic());
+
+        Wardrobe updatedWardrobe = wardrobeRepository.save(wardrobe);
+
+        WardrobeDetailedDto response = new WardrobeDetailedDto(updatedWardrobe);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+    }
 }

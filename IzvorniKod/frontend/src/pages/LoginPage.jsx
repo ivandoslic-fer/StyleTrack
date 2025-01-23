@@ -2,21 +2,47 @@ import { Container, Box, TextField, Button, Typography, Divider } from '@mui/mat
 import { Google, GitHub, HowToReg } from '@mui/icons-material';
 import { useState } from 'react';
 import { styleTrackAuthProvider } from '../util/styleTrackUtil';
+import { useSnackbar } from '../context/SnackbarContext';
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { showSnackbar } = useSnackbar();
 
   const handleLogin = async () => {
+    // Validation for empty fields
+    if (!username.trim()) {
+      showSnackbar({
+        severity: "error",
+        message: "Username cannot be empty",
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (!password.trim()) {
+      showSnackbar({
+        severity: "error",
+        message: "Password cannot be empty",
+        duration: 3000,
+      });
+      return;
+    }
+
     try {
       const success = await styleTrackAuthProvider.signIn(username, password);
       if (success) {
-          location.replace("/"); // Redirect to home on successful login
+        location.replace("/"); // Redirect to home on successful login
       }
-  } catch (error) {
+    } catch (error) {
       console.error("Login failed:", error);
-  }
-  }
+      showSnackbar({
+        severity: "error",
+        message: "Login failed. Please check your credentials.",
+        duration: 3000,
+      });
+    }
+  };
 
   return (
     <Container
@@ -39,12 +65,13 @@ export default function LoginPage() {
         }}
       >
         {/* Page Title */}
-        <Typography variant="h5" component="h1" gutterBottom align="center">
+        <Typography id='login-header' variant="h5" component="h1" gutterBottom align="center">
           Login
         </Typography>
 
         {/* Username and Password Fields */}
         <TextField
+          id='user-name'
           label="Username"
           variant="outlined"
           fullWidth
@@ -53,6 +80,7 @@ export default function LoginPage() {
           onChange={e => setUsername(e.target.value)}
         />
         <TextField
+          id="password"
           label="Password"
           type="password"
           variant="outlined"
@@ -64,6 +92,7 @@ export default function LoginPage() {
 
         {/* Login Button */}
         <Button
+          id='login-button'
           variant="contained"
           color="primary"
           fullWidth
@@ -79,16 +108,17 @@ export default function LoginPage() {
         {/* SSO Buttons */}
         <Button
           variant="outlined"
-          disabled={true}
           startIcon={<Google />}
           fullWidth
           sx={{ marginBottom: 1 }}
+          onClick={() => {
+            styleTrackAuthProvider.googleLogin();
+          }}
         >
           Sign in with Google
         </Button>
         <Button
           variant="outlined"
-          disabled={true}
           startIcon={<GitHub />}
           sx={{ marginBottom: 1 }}
           fullWidth
@@ -106,7 +136,7 @@ export default function LoginPage() {
           startIcon={<HowToReg />}
           fullWidth
         >
-          <a href='/register'>Let&apos;s sign you up!</a>
+          <a id='goto-register' href='/register'>Let&apos;s sign you up!</a>
         </Button>
       </Box>
     </Container>

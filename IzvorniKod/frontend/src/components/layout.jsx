@@ -1,3 +1,4 @@
+import { SnackbarProvider } from "../context/SnackbarContext";
 import TopAppBar from "./TopAppBar";
 import { useEffect, useState } from "react";
 
@@ -9,9 +10,11 @@ export default function StyleTrackLayout({ children }) {
   }, []);
 
   return (
-    <div className="w-full p-0 m-0 bg-red">
+    <div className="w-full h-[100svh] p-0 m-0 bg-red">
+      <SnackbarProvider>
         {!isAuthPage && <TopAppBar />}
         { children }
+      </SnackbarProvider>
     </div>
   )
 }

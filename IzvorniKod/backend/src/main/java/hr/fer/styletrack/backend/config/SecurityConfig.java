@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -16,6 +17,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -47,17 +49,20 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/api/login", "/api/register", "/oauth2/**", "/api/users/**", "/api/advertisers/**").permitAll();
+                    auth.requestMatchers("/api/login", "/api/register", "/oauth2/**", "/api/users/**", "/api/advertisers/**", "/api/tags/**", "/ws/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/wardrobes/**", "/api/sections/**", "/api/items/**").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> {
                     httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
                 })
-                /* .oauth2Login(oauth2 -> {
+                .oauth2Login(oauth2 -> {
                     oauth2.successHandler(oAuth2AuthenticationSuccessHandler);
-                })*/
+                })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exception -> {
+                    exception.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+                })
                 .build();
     }
 
@@ -66,7 +71,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://styletrack.onrender.com/")); // Make sure to change this for production
+        configuration.setAllowedOrigins(List.of("https://styletrack.onrender.com")); // Make sure to change this for production
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);

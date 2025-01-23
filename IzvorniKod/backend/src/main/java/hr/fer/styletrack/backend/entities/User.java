@@ -25,6 +25,7 @@ public class User {
     private String email;
     private boolean isAdvertiser;
     private String displayName;
+    private String profilePicture;
 
     public User() { };
 

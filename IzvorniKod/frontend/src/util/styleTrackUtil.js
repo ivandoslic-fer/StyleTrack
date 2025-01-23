@@ -15,29 +15,31 @@ import CreateWardrobePage from '../pages/CreateWardrobePage';
 import CreateSectionPage from '../pages/CreateSectionPage';
 import SectionPage from '../pages/SectionPage';
 import CreateItemPage from '../pages/CreateItemPage';
+import UnauthorizedPage from '../pages/UnauthorizedPage';
+import ItemPage from '../pages/ItemPage';
+import ItemSearchPage from '../pages/ItemSearchPage';
+import AdvertiserLocationPage from '../pages/AdvertiserLocationsPage'
+import NotificationsPage from '../pages/NotificationsPage';
+import CreateOutfitPage from '../pages/CreateOutfitPage';
+import OutfitsPage from '../pages/OutfitsPage';
+import OutfitPage from '../pages/OutfitPage';
 
+const SHARING_ICON = "https://img.icons8.com/?size=100&id=tu1zRqb5NUud&format=png&color=000000";
 
-const BACKEND_URL = "https://styletrack-backend.onrender.com/api";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const styleTrackAuthProvider = {
     isAuthenticated: false,
-    username: null,
     token: null,
-    userData: null,
     signIn: async (username, password) => {
         try {
             const response = await axios.post(`${BACKEND_URL}/login`, { username, password });
             
             styleTrackAuthProvider.isAuthenticated = true;
-            styleTrackAuthProvider.username = response.data.username;
             styleTrackAuthProvider.token = response.data.token;
 
-            styleTrackAuthProvider.userData = response.data.user;
-
-            // Save token and username to localStorage for persistent login state
+            // Save token to localStorage for persistent login state
             localStorage.setItem('authToken', response.data.token);
-            localStorage.setItem('username', response.data.username);
-            localStorage.setItem('userData', JSON.stringify(response.data.user));
 
             return true; // Indicate success for manual redirect in component
         } catch (error) {
@@ -55,35 +57,42 @@ export const styleTrackAuthProvider = {
             throw new Error("Registration failed");
         }
     },
+    getCurrentUser: async () => {
+        try {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                throw new Error("No token found");
+            }
+
+            const response = await axios.get(`${BACKEND_URL}/users/current`, {
+                headers: { "Authorization": `Bearer ${token}`},
+            });
+
+            return response.data;
+        } catch (e) {
+            console.error("Could not fetch the user", e);
+            handleAuthError(e, true);
+        }
+    },
     logOut: async () => {
         styleTrackAuthProvider.isAuthenticated = false;
-        styleTrackAuthProvider.username = null;
         styleTrackAuthProvider.token = null;
 
         // Remove token and username from localStorage
         localStorage.removeItem('authToken');
-        localStorage.removeItem('username');
-        localStorage.removeItem('userData');
     },
     githubLogin: async () => {
-        location.replace("http://localhost:8080/oauth2/authorization/github");
+        location.replace("https://styletrack-backend.onrender.com/oauth2/authorization/github");
+    },
+    googleLogin: async () => {
+        location.replace("https://styletrack-backend.onrender.com/oauth2/authorization/google");
     },
     loadToken: () => {
         const token = localStorage.getItem('authToken');
-        const username = localStorage.getItem('username');
-        let userData;
-        try {
-            userData = JSON.parse(localStorage.getItem('userData'))
-        } catch (e) {
-            userData = "";
-            console.error(e);
-        }
         
-        if (token && username) {
+        if (token) {
             styleTrackAuthProvider.isAuthenticated = true;
             styleTrackAuthProvider.token = token;
-            styleTrackAuthProvider.username = username;
-            styleTrackAuthProvider.userData = userData;
         }
     }
 };
@@ -94,43 +103,96 @@ styleTrackAuthProvider.loadToken();
 export const requestHandler = {
     postRequest: async (url, payload) => {
         try {
-            const response = await axios.post(`${BACKEND_URL}${url}`, payload, { headers: {
-                "Content-type": "application/json",
-                 "Authorization": `Bearer ${styleTrackAuthProvider.token}`,
-            }});
-
+            const response = await axios.post(`${BACKEND_URL}${url}`, payload, { headers: getHeaders() });
             return response;
         } catch (error) {
-            console.error("POST failed", error);
-            throw new Error("POST failed");
+            handleAuthError(error, false);
         }
     },
     getRequest: async (url) => {
         try {
-            while(!styleTrackAuthProvider.token);
-            const response = await axios.get(`${BACKEND_URL}${url}`, { headers: {
-                "Content-type": "application/json",
-                 "Authorization": `Bearer ${styleTrackAuthProvider.token}`,
-            }});
-
+            const response = await axios.get(`${BACKEND_URL}${url}`, { headers: getHeaders() });
             return response;
         } catch (error) {
-            console.error("GET failed", error);
-            throw new Error("GET failed");
+            handleAuthError(error, false);
         }
     },
     putRequest: async (url, payload) => {
         try {
-            const response = await axios.put(`${BACKEND_URL}${url}`, payload, { headers: {
-                "Content-type": "application/json",
-                 "Authorization": `Bearer ${styleTrackAuthProvider.token}`,
-            }});
-
+            const response = await axios.put(`${BACKEND_URL}${url}`, payload, { headers: getHeaders() });
             return response;
         } catch (error) {
-            console.error(error);
-            throw new Error("PUT request failed (Probably unauthorized)"); // TODO: Handle this better
+            handleAuthError(error, false);
         }
+    },
+    deleteRequest: async (url) => {
+        try {
+            const response = await axios.delete(`${BACKEND_URL}${url}`, { headers: getHeaders() });
+            return response;
+        } catch (error) {
+            handleAuthError(error, false);
+        }
+    },
+    imagePostRequest: async (url, payload) => {
+        try {
+            const response = await axios.post(`${BACKEND_URL}${url}`, payload, { headers: getMultipartHeaders() });
+            return response;
+        } catch (error) {
+            handleAuthError(error, false);
+        }
+    }
+};
+
+// Helper function to get headers
+const getHeaders = () =>  {
+    return styleTrackAuthProvider.isAuthenticated ? ({
+        "Content-type": "application/json",
+        "Authorization": `Bearer ${styleTrackAuthProvider.token}`,
+    }) : ({
+        "Content-type": "application/json",
+    })
+};
+
+const getMultipartHeaders = () => {
+    return styleTrackAuthProvider.isAuthenticated ? ({
+        "Content-type": "multipart/form-data",
+        "Authorization": `Bearer ${styleTrackAuthProvider.token}`,
+    }) : ({
+        "Content-type": "multipart/form-data",
+    })
+};
+
+// Handle authentication-related errors
+const handleAuthError = (error, gettingUser) => {
+    if (error.response && error.response.status === 401) {
+        console.error("JWT token expired or unauthorized access", error);
+        styleTrackAuthProvider.isAuthenticated = false;
+        styleTrackAuthProvider.token = null;
+
+        // Remove token from localStorage
+        if (gettingUser) {
+            localStorage.removeItem('authToken');
+
+            location.assign("/login"); // Ensure this is the correct login URL
+        } else {
+            location.assign("/unauthorized");
+        }
+    } else {
+        console.error(error);
+        throw new Error(error.response?.data?.message || "Request failed");
+    }
+};
+
+async function loadItemById(itemId) {
+    try {
+        const response = await requestHandler.getRequest(`/items/${itemId}`);
+        const sectionId = response.data.sectionId;
+        const response2 = await requestHandler.getRequest(`/sections/${sectionId}`);
+        const wardrobeId = response2.data.wardrobeId;
+        return {sectionId, wardrobeId};
+    } catch (error) {
+        console.error("Failed to load item:", error);
+        throw new Error("Item not found");
     }
 }
 
@@ -150,32 +212,63 @@ async function loginLoader() {
     return null;
 }*/
 
+async function authorizedLoader() {
+    try {
+        const user = await styleTrackAuthProvider.getCurrentUser();
+        return user;
+    } catch {
+        return redirect("/login");
+    }
+}
+
 async function profileLoader({ request }) {
     const url = new URL(request.url);
-    if (!styleTrackAuthProvider.isAuthenticated) {
-        // Redirect unauthenticated users to login
-        const params = new URLSearchParams();
-        params.set("from", url.pathname);
-        return redirect(`/login?${params.toString()}`);
-    }
 
     // If the current path is `/profile`, redirect to `/profile/:username`
     if (url.pathname === "/profile") {
-        return redirect(`/profile/${styleTrackAuthProvider.username}`);
+        const user = await styleTrackAuthProvider.getCurrentUser();
+
+        if (!user) return redirect("/login");
+
+        return redirect(`/profile/${user.username}`);
     }
 
     // Otherwise, allow navigation to the specific profile page
     return null;
 }
 
+async function profileSettingsLoader(args) {
+    let user;
+    try {
+        user = await styleTrackAuthProvider.getCurrentUser();
+    } catch (e) {
+        return handleAuthError(e);
+    }
+
+    if (!user) return handleAuthError({ response: { status: 401 }});
+
+    if (args.params.username !== user.username) return redirect(`/profile/${user.username}/settings`);
+
+    return user;
+}
+
 async function loadProfile(username) {
-    console.log("Returning data for username: " + username);
     const response = await (requestHandler.getRequest(`/users/username/${username}`));
+    return response.data;
+}
+
+async function loadItem(wardrobeId, sectionId, itemId) {
+    const response = await requestHandler.getRequest(`/items/${itemId}`);
     return response.data;
 }
 
 async function loadWardrobe(wardrobeId) {
     const response = await requestHandler.getRequest(`/wardrobes/${wardrobeId}`);
+    return response.data;
+}
+
+async function loadOutfit(outfitId) {
+    const response = await requestHandler.getRequest(`/outfits/${outfitId}`);
     return response.data;
 }
 
@@ -188,9 +281,6 @@ export const router = createBrowserRouter([
     {
         path: "/",
         Component: HomePage,
-        loader: () => {
-            return { user: styleTrackAuthProvider.username }
-        }
     },
     {
         path: "/login",
@@ -217,19 +307,34 @@ export const router = createBrowserRouter([
     },
     {
         path: "/profile/:username/settings",
-        loader: async ({ params }) => {
-            if (params.username !== styleTrackAuthProvider.username) return redirect(`/profile/${params.username}`);
-            return loadProfile(params.username);
-        },
+        loader: (args) => profileSettingsLoader(args),
         Component: ProfileSettingsPage
     },
     {
+        path: "/search/items",
+        Component: ItemSearchPage
+    },
+    {
         path: "/wardrobes",
+        loader: authorizedLoader,
         Component: ClosetsPage,
     },
     {
         path: "/wardrobes/create",
+        loader: authorizedLoader,
         Component: CreateWardrobePage
+    },
+    {
+        path: "/notifications",
+        loader: authorizedLoader,
+        Component: NotificationsPage
+    },
+    {
+        path: "/items/:itemId",
+        loader: async ({ params }) => {
+            const {sectionId, wardrobeId} = await loadItemById(params.itemId);
+            return redirect(`/wardrobes/${wardrobeId}/${sectionId}/item/${params.itemId}`);
+        },
     },
     {
         path: "/wardrobes/:wardrobeId",
@@ -238,6 +343,23 @@ export const router = createBrowserRouter([
             return loadWardrobe(params.wardrobeId);
         },
         Component: ClosetPage,
+    },
+    {
+        path: "/outfits",
+        loader: authorizedLoader,
+        Component: OutfitsPage
+    },
+    {
+        path: "/outfits/:outfitId",
+        loader: async ({ params }) => {
+            return loadOutfit(params.outfitId);
+        },
+        Component: OutfitPage
+    },
+    {
+        path: "/outfits/create",
+        loader: authorizedLoader,
+        Component: CreateOutfitPage
     },
     {
         path: "/wardrobes/:wardrobeId/addSection",
@@ -255,14 +377,39 @@ export const router = createBrowserRouter([
         Component: CreateItemPage
     },
     {
+        path: "/wardrobes/:wardrobeId/:sectionId/item/:itemId",
+        loader: async ({ params }) => {
+            return loadItem(params.wardrobeId, params.sectionId, params.itemId);
+        },
+        Component: ItemPage
+    },
+    {
         path: "/oauth2/redirect",
         Component: OAuth2RedirectHandler
     },
     {
         path: "/closet",
         Component: ClosetPage
+    },
+    {
+        path: "/unauthorized",
+        Component: UnauthorizedPage
+    }, {
+        path: "/advertiser/locations",
+        Component: AdvertiserLocationPage
     }
 ]);
+
+export const getAddressFromCoordinates = async (latitude, longitude) => {
+    try {
+      const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+      const address = response.data.display_name;
+      return address;
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      return "Address not available";
+    }
+  };  
 
 export const getRandomColor = () => {
     // Define an array of background colors

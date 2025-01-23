@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Setter
@@ -22,6 +24,10 @@ public class AdvertiserProfile implements Serializable {
     private String companyAddress;
     private String companyEmail;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "advertiser_profile_id")
+    private List<AdvertiserLocation> locations = new ArrayList<>();
+
     // Constructors
     public AdvertiserProfile() {}
 
@@ -29,5 +35,13 @@ public class AdvertiserProfile implements Serializable {
         this.user = user;
         this.companyAddress = companyAddress;
         this.companyEmail = companyEmail;
+    }
+
+    public void addLocation(AdvertiserLocation location) {
+        locations.add(location);
+    }
+
+    public void removeLocation(AdvertiserLocation location) {
+        locations.remove(location);
     }
 }
