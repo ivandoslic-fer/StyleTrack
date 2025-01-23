@@ -64,7 +64,7 @@ public class WardrobesController {
                     .map(WardrobeDto::new).collect(Collectors.toList()));
         }
 
-        if ((forSharing == null || !forSharing) && username.equals(authenticatedPrincipal.user.getUsername())) {
+        if ((forSharing == null || !forSharing) && username.equals(authenticatedPrincipal.getUsername())) {
 
             Optional<User> user = userRepository.findByUsername(username);
 
@@ -84,6 +84,7 @@ public class WardrobesController {
 
     @GetMapping("/{wardrobeId}")
     public ResponseEntity<WardrobeDetailedDto> getWardrobeById(@PathVariable Long wardrobeId, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal) {
+        System.out.println("GOT INTO WARDROBE GET");
         Wardrobe wardrobe = wardrobeRepository.findById(wardrobeId).orElse(null);
 
         if (wardrobe == null) {

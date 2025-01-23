@@ -64,7 +64,7 @@ public class AuthController {
             Optional<User> user = userRepository.findByUsername(loginRequest.getUsername());
 
             if (!user.isPresent()) {
-                throw new UsernameNotFoundException(loginRequest.getUsername());
+                return ResponseEntity.badRequest().build();
             }
 
             // Generate JWT
