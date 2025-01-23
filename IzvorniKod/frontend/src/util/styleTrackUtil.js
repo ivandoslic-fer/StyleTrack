@@ -82,10 +82,10 @@ export const styleTrackAuthProvider = {
         localStorage.removeItem('authToken');
     },
     githubLogin: async () => {
-        location.replace("https://styletrack-backend-stage.onrender.com/oauth2/authorization/github");
+        location.replace("https://styletrack-backend.onrender.com/oauth2/authorization/github");
     },
     googleLogin: async () => {
-        location.replace("https://styletrack-backend-stage.onrender.com/oauth2/authorization/google");
+        location.replace("https://styletrack-backend.onrender.com/oauth2/authorization/google");
     },
     loadToken: () => {
         const token = localStorage.getItem('authToken');

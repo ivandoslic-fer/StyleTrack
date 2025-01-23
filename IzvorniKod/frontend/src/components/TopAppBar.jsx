@@ -22,7 +22,7 @@ export default function ResponsiveAppBar() {
   const [unreadNotificationIds, setUnreadNotificationIds] = useState(new Set()); // To track unique unread notification IDs
 
   const connectWebSocket = (user) => {
-    const socket = new SockJS("http://localhost:8080/ws");
+    const socket = new SockJS("https://styletrack-backend.onrender.com/ws");
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
