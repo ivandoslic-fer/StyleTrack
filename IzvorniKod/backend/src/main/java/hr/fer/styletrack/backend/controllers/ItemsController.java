@@ -196,4 +196,37 @@ public class ItemsController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ItemDto> updateItem(@PathVariable Long id, @RequestBody ItemDto itemDto, @AuthenticationPrincipal StyleTrackUserDetails authenticatedPrincipal) {
+        Optional<Item> item = itemRepository.findById(id);
+
+        if (!item.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Item itemVal = item.get();
+
+        if (!itemVal.getItemId().equals(itemDto.getItemId())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (!authenticatedPrincipal.getUsername().equals(itemDto.getOwnerUsername())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            itemVal.setItemName(itemDto.getItemName());
+            itemVal.setDescription(itemDto.getDescription());
+            itemVal.setSeasonCategory(itemDto.getSeasonCategory());
+            itemVal.setBrand(itemDto.getBrand());
+            itemVal.setForSharing(itemDto.isForSharing());
+
+            itemRepository.save(itemVal);
+
+            return ResponseEntity.ok(new ItemDto(itemVal));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

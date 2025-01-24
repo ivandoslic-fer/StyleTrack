@@ -14,6 +14,7 @@ import {
 import OutfitCard from '../components/OutfitCard';
 import { requestHandler } from '../util/styleTrackUtil';
 import axios from 'axios';
+import { useSnackbar } from '../context/SnackbarContext';
 
 export default function OutfitsPage() {
   const [outfits, setOutfits] = useState([]);
@@ -21,6 +22,7 @@ export default function OutfitsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [weatherData, setWeatherData] = useState(null);
   const [filter, setFilter] = useState('all');
+  const { showSnackbar } = useSnackbar();
 
   useEffect(() => {
     const getMyOutfits = async () => {
@@ -80,15 +82,34 @@ export default function OutfitsPage() {
     fetchWeatherData();
   }, []);
 
+  useEffect(() => {
+    if (filteredOutfits.length == 0) {
+      showSnackbar({
+        severity: "info",
+        message: "Looks like you don't have an outfit for the current weather :(",
+        duration: 3000
+      });
+    }
+  }, [filteredOutfits]);
+
   const handleDeleteOutfit = async (id) => {
     try {
-      await requestHandler.deleteRequest(`/outfits/delete/${id}`);
+      await requestHandler.deleteRequest(`/outfits/${id}`);
       setOutfits((prevOutfits) => prevOutfits.filter((outfit) => outfit.id !== id));
       setFilteredOutfits((prevOutfits) =>
         prevOutfits.filter((outfit) => outfit.id !== id)
       );
+      showSnackbar({
+        severity: "success",
+        message: "Successfully deleted an outfit!",
+        duration: 3000
+      });
     } catch (e) {
-      console.error('Error deleting outfit:', e);
+      showSnackbar({
+        severity: "error",
+        message: "There was a problem deleting your outfit.",
+        duration: 3000
+      });
     }
   };
 

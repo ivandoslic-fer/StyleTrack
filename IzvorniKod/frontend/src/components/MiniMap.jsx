@@ -32,7 +32,7 @@ const Minimap = ({ selectedLocation, onSelectedLocationChange, displayOnly }) =>
   const [isFirstVisit, setIsFirstVisit] = useState(true);
 
   const wardrobeIcon = new L.Icon({
-    iconUrl: "https://img.icons8.com/?size=100&id=ELzyEInw6DCj&format=png&color=000000",
+    iconUrl: "https://img.icons8.com/?size=100&id=WbqhJjjts8qI&format=png&color=000000",
     iconSize: [36, 36]
   });
 

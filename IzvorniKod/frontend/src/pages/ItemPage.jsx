@@ -1,9 +1,10 @@
 import { Box, Typography, Paper, TextField, Switch, Button, Chip } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import GalleryUpload from "../components/GalleryUpload";
 import { useLoaderData } from "react-router-dom";
 import { VolunteerActivism } from "@mui/icons-material";
 import { useSnackbar } from "../context/SnackbarContext";
+import { requestHandler, styleTrackAuthProvider } from "../util/styleTrackUtil";
 
 export default function ItemPage() {
     const data = useLoaderData();
@@ -21,14 +22,39 @@ export default function ItemPage() {
 
   const [tags, setTags] = useState(data.itemTags);
 
-  const handleEditToggle = () => {
-    showSnackbar({
-        message: "Editing not available. Coming soon...",
-        severity: "warning",
-        duration: 3000
-    })
-    // todo: implement
-    // setEditing((prev) => !prev)
+  const handleEditToggle = async () => {
+    if (editing) {
+      // handle the update with the server.
+
+      try {
+        const res = await requestHandler.putRequest(`/items/${data.itemId}`, {
+          ...formData,
+          sectionId: data.sectionId,
+          itemId: data.itemId,
+          ownerUsername: data.ownerUsername,
+          category: data.category,
+          mainImageUrl: data.mainImageUrl,
+          itemTags: data.itemTags,
+          galleryImages: data.galleryImages        
+        });
+  
+        showSnackbar({
+          severity: "success",
+          message: "Successfull updated the item!",
+          duration: 3000
+        });
+
+        location.reload();
+      } catch (e) {
+        showSnackbar({
+          severity: "error",
+          message: "An error has occured trying to update the item",
+          duration: 3000
+        });
+        return;
+      }
+    }
+    setEditing((prev) => !prev)
   };
 
   const handleCancel = () => {
@@ -53,6 +79,24 @@ export default function ItemPage() {
       },
     }));
   };
+
+  useEffect(() => {
+    const initialLoad = async () => {
+      let user;
+      try {
+        user = await styleTrackAuthProvider.getCurrentUser();
+      } catch (e) {
+        user = null;
+      }
+
+      console.log(user);
+      console.log(data);
+
+      setIsUsersItem(user && data.ownerUsername === user.username);
+    }
+
+    initialLoad();
+  }, []);
 
   return (
     <div className="flex-1 p-4">
@@ -163,7 +207,15 @@ export default function ItemPage() {
           )}
         </Box>
 
-        <Box className="mb-4">
+        <Box className="mb-4" onClick={() => {
+          if (editing) {
+            showSnackbar({
+              severity: "warning",
+              message: "Sorry changing category fields is not implemented yet.",
+              duration: 3000
+            })
+          }
+        }}>
           <Typography variant="body1" className="font-medium">
             <b>Category Fields:</b>
           </Typography>
@@ -198,12 +250,20 @@ export default function ItemPage() {
         </div>
         <div className="flex flex-1 flex-col">
 
-        <Box className="mb-4">
+        <Box className="mb-4" onClick={() => {
+          if (editing) {
+            showSnackbar({
+              severity: "warning",
+              message: "Sorry changing items images is not implemented yet.",
+              duration: 3000
+            })
+          }
+        }}>
           <Typography variant="body1" className="font-medium">
             <b>Gallery:</b>
           </Typography>
           {/** DON'T FORGET TO UPDATE HERE WHEN IMPLEMENTING EDITING */}
-          <GalleryUpload imageUrls={data.galleryImages} setImageUrls={setFormData} disabled={true}/ >
+          <GalleryUpload imageUrls={data.galleryImages} setImageUrls={setFormData} disabled={true} />
         </Box>
 
         <Box className="mb-4">
@@ -217,7 +277,15 @@ export default function ItemPage() {
                 <Chip
                   key={index}
                   label={tag}
-                  onDelete={() => setTags((prev) => prev.filter((t) => t !== tag))}
+                  onDelete={() => {
+                    if (editing) {
+                      showSnackbar({
+                        severity: "warning",
+                        message: "Sorry updating tags is not implemented yet.",
+                        duration: 3000
+                      })
+                    }
+                  }}
                   color="primary"
                   style={{ marginRight: 8, marginBottom: 8 }}
                 />
@@ -225,6 +293,15 @@ export default function ItemPage() {
               <TextField
                 fullWidth
                 placeholder="Add new tag"
+                disabled={true}
+                helperText="Not available"
+                onClick={() => {
+                  showSnackbar({
+                    severity: "warning",
+                    message: "Sorry changing tags is not implemented yet.",
+                    duration: 3000
+                  });
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && e.target.value.trim()) {
                     setTags((prev) => [...prev, e.target.value.trim()]);

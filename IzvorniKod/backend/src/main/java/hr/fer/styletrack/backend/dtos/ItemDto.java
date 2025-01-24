@@ -21,6 +21,7 @@ public class ItemDto {
     private Long sectionId;
     private Long itemId;
     private String itemName;
+    private String ownerUsername;
     private String category;
     private String description;
     private String seasonCategory;
@@ -35,10 +36,11 @@ public class ItemDto {
 
     public ItemDto(Long sectionId, Long itemId, String itemName, Set<String> itemTags, String description,
                    String category, String seasonCategory, String brand, String mainImageUrl, Map<String, Object> categoryFields,
-                   Set<String> galleryImages, boolean forSharing) {
+                   String ownerUsername, Set<String> galleryImages, boolean forSharing) {
         this.sectionId = sectionId;
         this.itemId = itemId;
         this.itemName = itemName;
+        this.ownerUsername = ownerUsername;
         this.itemTags = itemTags;
         this.description = description;
         this.category = category;
@@ -46,7 +48,7 @@ public class ItemDto {
         this.brand = brand;
         this.mainImageUrl = mainImageUrl;
         this.categoryFields = categoryFields;
-        this.forSharing = false;
+        this.forSharing = forSharing;
         this.galleryImages = galleryImages;
     }
 
@@ -54,6 +56,7 @@ public class ItemDto {
         this.sectionId = item.getSection().getSectionId();
         this.itemId = item.getItemId();
         this.itemName = item.getItemName();
+        this.ownerUsername = item.getSection().getWardrobe().getUser().getUsername();
         this.itemTags = item.getTags().stream().map(Tag::getTagName).collect(Collectors.toSet());
         this.description = item.getDescription();
         this.category = getCategoryName(item.getCategory());

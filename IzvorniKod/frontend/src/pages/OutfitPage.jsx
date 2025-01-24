@@ -174,7 +174,13 @@ import {
                 </Button>
               )}
               {isUsersOutfit && (
-                <Button variant="contained" color="primary" onClick={handleEditToggle}>
+                <Button variant="contained" color="primary" onClick={() => {
+                  showSnackbar({
+                    severity: "warning",
+                    message: "Editing of outfits not implemented yet, sorry!",
+                    duration: 3000
+                  });
+                }}>
                   {isEditing ? "Save" : "Edit"}
                 </Button>
               )}

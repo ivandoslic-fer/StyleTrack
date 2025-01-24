@@ -108,7 +108,7 @@ const CreateOutfitPage = () => {
     );
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newOutfit = {
       name: outfitName,
       itemIds: selectedItems,
@@ -116,7 +116,7 @@ const CreateOutfitPage = () => {
     };
 
     try {
-      requestHandler.postRequest('/outfits/create', newOutfit);
+      await requestHandler.postRequest('/outfits/create', newOutfit);
     } catch (e) {
       showSnackbar({
         severity: "error",
